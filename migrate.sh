@@ -14,3 +14,5 @@ if [ $status -ne 0 ]; then
   echo "Error durante la migración o el seed. Código de salida: $status"
   exit $status
 fi
+
+echo "Migración y seed completados con éxito."

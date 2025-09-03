@@ -327,10 +327,10 @@ Los **modelos** en Laravel representan las tablas de la base de datos y nos perm
 php artisan make:model Category
 
 # Crear modelo para Product
-php artisan make:model Category
+php artisan make:model Product
 
 # Crear modelo para Customer
-php artisan make:model Category
+php artisan make:model Customer
 ```
 
 #### Estructura básica de un modelo:
