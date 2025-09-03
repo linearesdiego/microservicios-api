@@ -1,0 +1,182 @@
+<mxfile host="65bd71144e">
+    <diagram name="Repositorio Git - microservicios-api" id="git-repo-diagram">
+        <mxGraphModel dx="1391" dy="787" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="0" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="24" value="" style="edgeStyle=none;html=1;endArrow=none;endFill=0;" edge="1" parent="1" source="repo-principal" target="23">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="repo-principal" value="&lt;span style=&quot;color: rgb(255, 255, 255); font-size: 14px; font-weight: 700;&quot;&gt;Repositorio Principal&lt;/span&gt;&lt;br style=&quot;color: rgb(192, 192, 192); scrollbar-color: rgb(75, 75, 75) rgb(27, 29, 30); font-size: 14px; font-weight: 700;&quot;&gt;&lt;b style=&quot;color: rgb(192, 192, 192); scrollbar-color: rgb(75, 75, 75) rgb(27, 29, 30); font-size: 14px;&quot;&gt;microservicios-api&lt;/b&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e6d0de;strokeColor=none;strokeWidth=2;gradientColor=#d5739d;gradientDirection=north;verticalAlign=top;" parent="1" vertex="1">
+                    <mxGeometry x="315" y="130" width="200" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="main-branch-principal" value="main" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=none;gradientColor=#97d077;fontStyle=1" parent="1" vertex="1">
+                    <mxGeometry x="364" y="190" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" style="edgeStyle=none;html=1;dashed=1;strokeWidth=2;fillColor=#76608a;strokeColor=#432D57;endArrow=none;endFill=0;" parent="1" source="fork1" target="2" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="git pull" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;" parent="4" vertex="1" connectable="0">
+                    <mxGeometry x="-0.0621" y="-1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fork1" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;gradientColor=#ffd966;" parent="1" vertex="1">
+                    <mxGeometry x="74" y="350" width="200" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="fork1-title" value="Fork 1&lt;br&gt;&lt;b&gt;dev1/microservicios-api&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="74" y="360" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="main-branch-fork1" value="main" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=none;gradientColor=#97d077;" parent="1" vertex="1">
+                    <mxGeometry x="124" y="400" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="trabajo-branch-fork1" value="trabajo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=none;gradientColor=#7ea6e0;" parent="1" vertex="1">
+                    <mxGeometry x="124" y="464" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="fork2" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;strokeWidth=2;gradientColor=#ffd966;" parent="1" vertex="1">
+                    <mxGeometry x="554" y="350" width="200" height="160" as="geometry"/>
+                </mxCell>
+                <mxCell id="fork2-title" value="Fork 2&lt;br&gt;&lt;b&gt;dev2/microservicios-api&lt;/b&gt;" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=12;" parent="1" vertex="1">
+                    <mxGeometry x="554" y="360" width="200" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="main-branch-fork2" value="main" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=none;gradientColor=#97d077;" parent="1" vertex="1">
+                    <mxGeometry x="604" y="400" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="trabajo-branch-fork2" value="trabajo" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=none;gradientColor=#7ea6e0;" parent="1" vertex="1">
+                    <mxGeometry x="604" y="464" width="100" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="fork-arrow1" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#d79b00;strokeWidth=2;" parent="1" source="repo-principal" target="fork1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="364" y="300" as="sourcePoint"/>
+                        <mxPoint x="414" y="250" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fork-label1" value="fork (sync)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=12;" parent="fork-arrow1" vertex="1" connectable="0">
+                    <mxGeometry x="-0.1" y="1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fork-arrow2" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#d79b00;strokeWidth=2;" parent="1" source="repo-principal" target="fork2" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="494" y="300" as="sourcePoint"/>
+                        <mxPoint x="544" y="250" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="fork-label2" value="fork (sync)" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=12;" parent="fork-arrow2" vertex="1" connectable="0">
+                    <mxGeometry x="-0.1" y="1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="branch-arrow1" value="" style="endArrow=classic;html=1;rounded=0;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#6c8ebf;strokeWidth=2;" parent="1" source="main-branch-fork1" target="trabajo-branch-fork1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="194" y="440" as="sourcePoint"/>
+                        <mxPoint x="244" y="390" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="branch-arrow2" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#6c8ebf;strokeWidth=2;" parent="1" source="main-branch-fork2" target="trabajo-branch-fork2" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="674" y="440" as="sourcePoint"/>
+                        <mxPoint x="724" y="390" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <UserObject label="&lt;font style=&quot;scrollbar-color: rgb(75, 75, 75) rgb(27, 29, 30);&quot;&gt;&lt;b style=&quot;scrollbar-color: rgb(75, 75, 75) rgb(27, 29, 30); color: rgb(192, 192, 192);&quot;&gt;mainsync.sh&lt;/b&gt;&lt;br style=&quot;scrollbar-color: rgb(75, 75, 75) rgb(27, 29, 30); font-weight: 700; color: rgb(192, 192, 192);&quot;&gt;&lt;/font&gt;&lt;span style=&quot;scrollbar-color: rgb(75, 75, 75) rgb(27, 29, 30); font-weight: 700; color: rgb(255, 255, 255);&quot;&gt;Script de Sincronización&lt;/span&gt;" id="script-box">
+                    <mxCell style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=none;strokeWidth=2;gradientColor=#ea6b66;verticalAlign=top;gradientDirection=north;" parent="1" vertex="1">
+                        <mxGeometry x="329" y="387.5" width="170" height="55" as="geometry"/>
+                    </mxCell>
+                </UserObject>
+                <mxCell id="sync-arrow" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#B20000;strokeWidth=2;strokeStyle=dashed;fillColor=#e51400;" parent="1" source="repo-principal" target="script-box" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="414" y="350" as="sourcePoint"/>
+                        <mxPoint x="464" y="300" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="sync-fork1" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#B20000;strokeWidth=2;strokeStyle=dashed;fillColor=#e51400;" parent="1" source="script-box" target="main-branch-fork1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="244" y="550" as="sourcePoint"/>
+                        <mxPoint x="294" y="500" as="targetPoint"/>
+                        <Array as="points"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="sync-fork1-label" value="sincroniza" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=9;labelBackgroundColor=none;" parent="sync-fork1" vertex="1" connectable="0">
+                    <mxGeometry x="-0.1" y="1" relative="1" as="geometry">
+                        <mxPoint x="19" y="-9" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="sync-fork2" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#B20000;strokeWidth=2;strokeStyle=dashed;fillColor=#e51400;" parent="1" source="script-box" target="main-branch-fork2" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="564" y="550" as="sourcePoint"/>
+                        <mxPoint x="614" y="500" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="sync-fork2-label" value="sincroniza" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;fontSize=9;labelBackgroundColor=none;" parent="sync-fork2" vertex="1" connectable="0">
+                    <mxGeometry x="-0.1" y="1" relative="1" as="geometry">
+                        <mxPoint x="-21" y="-7" as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="diagram-title" value="&lt;b&gt;Estructura del Repositorio Git - microservicios-api&lt;/b&gt;&lt;br&gt;Sincronización automática con mainsync.sh" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontStyle=1;fontSize=16;" parent="1" vertex="1">
+                    <mxGeometry x="214" y="40" width="400" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="change-indicator" value="⚡ CAMBIO" style="ellipse;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=none;fontStyle=1;fontSize=11;strokeWidth=2;gradientColor=#ea6b66;" parent="1" vertex="1">
+                    <mxGeometry x="184" y="185" width="90" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="2" value="Codespace" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=none;strokeWidth=2;fontStyle=1;gradientColor=#7ea6e0;glass=1;gradientDirection=north;" parent="1" vertex="1">
+                    <mxGeometry x="114" y="565" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" style="edgeStyle=none;html=1;dashed=1;endArrow=none;endFill=0;strokeWidth=2;fillColor=#76608a;strokeColor=#432D57;" parent="1" source="fork2" target="8" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="802" y="515" as="sourcePoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="7" value="git pull" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];fontStyle=1;" parent="6" vertex="1" connectable="0">
+                    <mxGeometry x="-0.0621" y="-1" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="8" value="Codespace" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=none;strokeWidth=2;fontStyle=1;gradientColor=#7ea6e0;glass=1;gradientDirection=north;" parent="1" vertex="1">
+                    <mxGeometry x="594" y="565" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" style="edgeStyle=none;html=1;strokeWidth=2;fillColor=#e51400;strokeColor=#B20000;" parent="1" source="9" target="change-indicator" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="Owner" style="shape=umlActor;verticalLabelPosition=bottom;verticalAlign=top;html=1;outlineConnect=0;fontStyle=1;fillColor=#f0a30a;fontColor=#000000;strokeColor=#BD7000;strokeWidth=3;" parent="1" vertex="1">
+                    <mxGeometry x="124" y="175" width="30" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#B20000;strokeWidth=2;strokeStyle=dashed;fillColor=#e51400;" parent="1" source="change-indicator" target="main-branch-principal" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="424" y="260" as="sourcePoint"/>
+                        <mxPoint x="424" y="610" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="16" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#B20000;strokeWidth=2;strokeStyle=dashed;fillColor=#e51400;exitX=0.75;exitY=1;exitDx=0;exitDy=0;entryX=0.75;entryY=0;entryDx=0;entryDy=0;" parent="1" source="main-branch-fork1" target="trabajo-branch-fork1" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="340" y="425" as="sourcePoint"/>
+                        <mxPoint x="234" y="425" as="targetPoint"/>
+                        <Array as="points"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="18" value="" style="endArrow=classic;html=1;rounded=0;strokeColor=#B20000;strokeWidth=2;strokeStyle=dashed;fillColor=#e51400;entryX=0.25;entryY=0;entryDx=0;entryDy=0;exitX=0.25;exitY=1;exitDx=0;exitDy=0;" parent="1" source="main-branch-fork2" target="trabajo-branch-fork2" edge="1">
+                    <mxGeometry width="50" height="50" relative="1" as="geometry">
+                        <mxPoint x="410" y="520" as="sourcePoint"/>
+                        <mxPoint x="209" y="474" as="targetPoint"/>
+                        <Array as="points"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="19" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/general/Branch.svg;" parent="1" vertex="1">
+                    <mxGeometry x="131" y="471" width="16" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="" style="image;aspect=fixed;html=1;points=[];align=center;fontSize=12;image=img/lib/azure2/general/Branch.svg;" parent="1" vertex="1">
+                    <mxGeometry x="614" y="471" width="16" height="16" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.visual_studio_online;" parent="1" vertex="1">
+                    <mxGeometry x="118" y="568" width="16" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="" style="verticalLabelPosition=bottom;html=1;verticalAlign=top;align=center;strokeColor=none;fillColor=#00BEF2;shape=mxgraph.azure.visual_studio_online;" parent="1" vertex="1">
+                    <mxGeometry x="597" y="568" width="16" height="15" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" value="CORE" style="ellipse;whiteSpace=wrap;html=1;verticalAlign=middle;fillColor=#e6d0de;strokeColor=none;rounded=1;strokeWidth=2;gradientColor=#d5739d;gradientDirection=north;fontStyle=1" vertex="1" parent="1">
+                    <mxGeometry x="597" y="150" width="80" height="80" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
