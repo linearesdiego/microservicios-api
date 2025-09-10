@@ -15,10 +15,12 @@ return new class extends Migration
             $table->id();
             $table->timestamps();
             $table->string('name');
-            $table->text('description')->nullable();
+            $table->longText('description')->nullable();
             $table->decimal('price',8,2)->default(0);
             $table->integer('stock')->default(0);
             $table->boolean('is_active')->default(false);
+            $table->string('image_url')->nullable()->after('description');
+            $table->string('weight')->nullable()->after('price');
         });
     }
 

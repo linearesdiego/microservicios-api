@@ -23,6 +23,8 @@ class ProductSeeder extends Seeder
                 'price' => 999.99,
                 'stock' => 50,
                 'is_active' => true,
+                'weight' => '0.2',
+                'image_url' => 'https://example.com/images/iphone15pro.jpg',
                 'category_id' => $electronics->id
             ],
             [
@@ -31,6 +33,8 @@ class ProductSeeder extends Seeder
                 'price' => 799.99,
                 'stock' => 25,
                 'is_active' => true,
+                'weight' => '0.2',
+                'image_url' => 'https://example.com/images/iphone15pro.jpg',
                 'category_id' => $electronics->id
             ],
 
@@ -41,6 +45,8 @@ class ProductSeeder extends Seeder
                 'price' => 19.99,
                 'stock' => 100,
                 'is_active' => true,
+                'weight' => '0.2',
+                'image_url' => 'https://example.com/images/iphone15pro.jpg',
                 'category_id' => $clothing->id
             ],
             [
@@ -49,6 +55,8 @@ class ProductSeeder extends Seeder
                 'price' => 49.99,
                 'stock' => 75,
                 'is_active' => true,
+                'weight' => '0.2',
+                'image_url' => 'https://example.com/images/iphone15pro.jpg',
                 'category_id' => $clothing->id
             ],
 
@@ -59,6 +67,8 @@ class ProductSeeder extends Seeder
                 'price' => 299.99,
                 'stock' => 20,
                 'is_active' => true,
+                'weight' => '0.2',
+                'image_url' => 'https://example.com/images/iphone15pro.jpg',
                 'category_id' => $home->id
             ],
 
@@ -68,6 +78,8 @@ class ProductSeeder extends Seeder
                 'description' => 'Balón oficial de fútbol profesional',
                 'price' => 39.99,
                 'stock' => 40,
+                'weight' => '0.2',
+                'image_url' => 'https://example.com/images/iphone15pro.jpg',
                 'is_active' => true,
                 'category_id' => $sports->id
             ]
