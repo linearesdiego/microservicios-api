@@ -509,6 +509,15 @@ $newCategory = Category::create([
     'is_active' => true
 ]);
 
+// Para segunda y sucesivas iteraciones utilizar:
+// $newCategory = Category::updateOrCreate([
+//     'name' => 'Libros',
+//     'slug' => 'libros',
+//     'description' => 'Libros y literatura',
+//     'color' => '#6f42c1',
+//     'is_active' => true
+// ]);
+
 echo "✓ Categoría creada con create(): {$newCategory->name} (ID: {$newCategory->id})\n\n";
 
 // 2. MÉTODO FIND - Buscar por ID
@@ -609,13 +618,37 @@ $manualCategory->description = 'Materiales para arte y proyectos creativos';
 $manualCategory->color = '#17a2b8';
 $manualCategory->is_active = true;
 
-$manualCategory->save();
-echo "✓ Categoría creada con save(): {$manualCategory->name} (ID: {$manualCategory->id})\n";
+// try {
+    $manualCategory->save();
+    echo "✓ Categoría creada con save(): {$manualCategory->name} (ID: {$manualCategory->id})\n";
 
-// Actualizar con save()
-$manualCategory->description = 'Materiales para arte, manualidades y proyectos DIY';
-$manualCategory->save();
-echo "✓ Categoría actualizada con save(): nueva descripción guardada\n\n";
+    // Actualizar con save()
+    $manualCategory->description = 'Materiales para arte, manualidades y proyectos DIY';
+    $manualCategory->save();
+    echo "✓ Categoría actualizada con save(): nueva descripción guardada\n\n";
+// } catch (Exception $e) {
+    // echo "❌ Error al guardar categoría: " . $e->getMessage() . "\n\n";
+// }
+
+// try {
+//     $manualCategory->description = 'Materiales para arte, manualidades y proyectos DIY';
+//     $manualCategory->save();
+//     echo "✓ Categoría actualizada con save(): nueva descripción guardada\n\n";
+// } catch (\Illuminate\Database\QueryException $e) {
+//     echo "❌ Error de base de datos: " . $e->getMessage() . "\n";
+//     echo "Código de error SQL: " . $e->getCode() . "\n";
+//     echo "SQL ejecutado: " . $e->getSql() . "\n";
+// } catch (\Illuminate\Validation\ValidationException $e) {
+//     echo "❌ Error de validación: " . $e->getMessage() . "\n";
+//     foreach ($e->errors() as $field => $errors) {
+//         echo "Campo $field: " . implode(', ', $errors) . "\n";
+//     }
+// } catch (\Exception $e) {
+//     echo "❌ Error general: " . $e->getMessage() . "\n";
+//     echo "Archivo: " . $e->getFile() . " (línea " . $e->getLine() . ")\n";
+//     echo "Trace: " . $e->getTraceAsString() . "\n";
+// }
+
 
 // 7. RESUMEN FINAL
 echo "7. RESUMEN DE CATEGORÍAS CREADAS:\n";
@@ -870,6 +903,129 @@ return new class extends Migration
         });
     }
 };
+```
+
+#### Insertar productos de prueba a la tabla products
+El siguiente código inserta productos de prueba en la tabla `products` sin utilizar seeders:
+
+1. **Crear archivo para insertar productos:**
+
+```bash
+touch ./insert_products.php
+```
+
+2. **Contenido del archivo `insert_products.php`:**
+
+```php
+<?php
+require_once 'vendor/autoload.php';
+$app = require_once 'bootstrap/app.php';
+$app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap
+();
+use App\Models\Product;
+echo "=== INSERTANDO PRODUCTOS DE PRUEBA ===\n\n";
+
+$products = [
+    [
+        'name' => 'iPhone 15',
+        'description' => 'El último modelo de iPhone con características avanzadas.',
+        'image_url' => 'https://example.com/images/iphone15.jpg',
+        'price' => 999.99,
+        'weight' => 0.174,
+        'stock' => 50,
+        'is_active' => true,
+        'category_id' => 1
+    ],
+    [
+        'name' => 'Samsung Galaxy S23',
+        'description' => 'Smartphone de alta gama con pantalla AMOLED.',
+        'image_url' => 'https://example.com/images/galaxy_s23.jpg',
+        'price' => 899.99,
+        'weight' => 0.168,
+        'stock' => 30,
+        'is_active' => true,
+        'category_id' => 1
+    ],
+    [
+        'name' => 'Dell XPS 13',
+        'description' => 'Portátil ultraligero con rendimiento excepcional.',
+        'image_url' => 'https://example.com/images/dell_xps13.jpg',
+        'price' => 1199.99,
+        'weight' => 1.2,
+        'stock' => 20,
+        'is_active' => true,
+        'category_id' => 2
+    ],
+    [
+        'name' => 'Sony WH-1000XM4',
+        'description' => 'Auriculares inalámbricos con cancelación de ruido líder en la industria.',
+        'image_url' => 'https://example.com/images/sony_wh1000xm4.jpg',
+        'price' => 349.99,
+        'weight' => 0.254,
+        'stock' => 100,
+        'is_active' => true,
+        'category_id' => 3
+    ]
+];
+
+foreach ($products as $productData) {
+    $product = Product::updateOrCreate(
+        ['name' => $productData['name']], // Condición de búsqueda
+        $productData // Datos a actualizar o crear
+    );
+    if ($product->wasRecentlyCreated) {
+        echo "✓ Producto creado: {$product->name} (ID: {$product->id})\n";
+    } else {
+        echo "✓ Producto actualizado: {$product->name} (ID: {$product->id})\n";
+    }
+}
+echo "\n=== TOTAL DE PRODUCTOS CREADOS: " . count($products) . " ===\n";
+```
+
+> Nota 1: Asegúrate de que la tabla `categories` tenga datos y que los IDs de categoría (`category_id`) en los productos coincidan con los existentes en la tabla `categories`.
+
+> Nota 2: Al ejecutar este documento PHP, se producirá un error porque el modelo `Product` no tiene definidos los campos que se están intentando asignar masivamente. Vamos a corregir esto.
+
+3. **Actualizar el modelo `Product` para permitir asignación masiva:**
+
+```php
+<?php
+namespace App\Models;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Product extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'name',
+        'description',
+        'image_url',
+        'price',
+        'weight',
+        'stock',
+        'is_active',
+        'category_id'
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
+        'price' => 'decimal:2',
+        'weight' => 'decimal:2',
+    ];
+
+    // Relación con categoría
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
+    }
+}
+```
+4. **Ejecutar el archivo para insertar productos:**
+
+```bash
+php insert_products.php
 ```
 
 ### 3.3 Caso Práctico Complejo
