@@ -18,6 +18,29 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+# Archivos que se deben ignorar durante la sincronización
+IGNORE_FILES=(
+    "database/seeders/DatabaseSeeder.php"
+    "routes/api.php"
+    "routes/web.php"
+    "config/app.php"
+    "config/database.php"
+    ".env"
+    ".env.local"
+    ".env.example"
+)
+
+# Función para verificar si un archivo debe ser ignorado
+is_ignored_file() {
+    local file="$1"
+    for ignored in "${IGNORE_FILES[@]}"; do
+        if [[ "$file" == "$ignored" ]]; then
+            return 0  # Es un archivo ignorado
+        fi
+    done
+    return 1  # No es un archivo ignorado
+}
+
 # Función para mostrar ayuda
 show_help() {
     echo -e "${BLUE}Uso: $(basename "$0") [branch-destino]${NC}"
@@ -29,6 +52,7 @@ show_help() {
     echo "  • Archivos modificados en main → Se sobreescriben automáticamente"
     echo "  • Archivos nuevos en main → Se agregan al branch"
     echo "  • Archivos únicos del branch → Se mantienen intactos"
+    echo "  • Archivos en la lista de ignorados → Se omiten completamente"
     echo ""
     echo "Parámetros:"
     echo "  branch-destino  Branch al cual sincronizar (default: branch actual)"
@@ -103,13 +127,18 @@ MAIN_FILES=$(git ls-tree -r --name-only $SOURCE_REF)
 MODIFIED_FILES=""
 NEW_FILES=""
 UNCHANGED_FILES=""
+IGNORED_FILES=""
 ERROR_COUNT=0
 
 echo -e "${BLUE}Categorizando archivos...${NC}"
 
 while IFS= read -r file; do
     if [[ -n "$file" ]]; then
-        if [[ -f "$file" ]]; then
+        # Verificar si el archivo debe ser ignorado
+        if is_ignored_file "$file"; then
+            IGNORED_FILES="$IGNORED_FILES$file\n"
+            echo -e "  ${CYAN}Ignorado: $file${NC}"
+        elif [[ -f "$file" ]]; then
             # El archivo existe en ambos branches, verificar si es diferente
             if ! git diff --quiet HEAD $SOURCE_REF -- "$file" 2>/dev/null; then
                 MODIFIED_FILES="$MODIFIED_FILES$file\n"
@@ -129,6 +158,7 @@ done <<< "$MAIN_FILES"
 MODIFIED_FILES=$(echo -e "$MODIFIED_FILES" | sed '/^$/d')
 NEW_FILES=$(echo -e "$NEW_FILES" | sed '/^$/d')
 UNCHANGED_FILES=$(echo -e "$UNCHANGED_FILES" | sed '/^$/d')
+IGNORED_FILES=$(echo -e "$IGNORED_FILES" | sed '/^$/d')
 
 # Mostrar resumen
 echo ""
@@ -149,6 +179,12 @@ fi
 if [[ -n "$UNCHANGED_FILES" ]]; then
     echo -e "${BLUE}Archivos sin cambios ($(echo -e "$UNCHANGED_FILES" | wc -l)):${NC}"
     echo -e "  (No se modificarán)"
+    echo ""
+fi
+
+if [[ -n "$IGNORED_FILES" ]]; then
+    echo -e "${CYAN}Archivos ignorados ($(echo -e "$IGNORED_FILES" | wc -l)):${NC}"
+    echo -e "$IGNORED_FILES" | sed 's/^/  🚫 /'
     echo ""
 fi
 

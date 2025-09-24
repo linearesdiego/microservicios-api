@@ -6,11 +6,13 @@
     ],
     "postCreateCommand": [
         "composer install",
-        "cp .env.example .env",
-        "php artisan key:generate",
+        "cp .env.example .env || true",
+        "php artisan key:generate --force",
         "php artisan migrate --seed --force",
-        "ln -s /workspaces/microservicios-api/migrate.sh /usr/local/bin/migrate"
+        "php artisan storage:link || true",
+        "chmod -R 775 storage bootstrap/cache"
     ],
+    "postStartCommand": "bash /workspaces/microservicios-api/.devcontainer/init.sh",
     "customizations": {
         "vscode": {
             "settings": {
@@ -48,7 +50,11 @@
                 "simonsiefke.svg-preview",
                 "vscode-icons-team.vscode-icons",
                 "xdebug.php-debug",
-                "zaaack.markdown-editor"
+                "zaaack.markdown-editor",
+                "devsense.composer-php-vscode",
+                "devsense.intelli-php-vscode",
+                "devsense.phptools-vscode",
+                "devsense.profiler-php-vscode"
             ]
         }
     }

@@ -3,6 +3,16 @@ FROM ubuntu:22.04
 ARG DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Argentina/San_Juan
 
+# Configurar locales
+RUN apt-get update && \
+    apt-get install -y locales && \
+    locale-gen es_ES.UTF-8 && \
+    update-locale LANG=es_ES.UTF-8
+
+# Establecer variables de entorno de locale
+ENV LANG=es_ES.UTF-8
+ENV LC_ALL=es_ES.UTF-8
+
 # Instala PHP 8.3 y extensiones comunes para Laravel, incluyendo SQLite
 RUN apt-get update && \
     apt-get install -y software-properties-common tzdata && \
