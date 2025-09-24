@@ -845,6 +845,11 @@ return new class extends Migration
 };
 ```
 
+> [!WARNING]
+> Hay que volver a ejecutar las migraciones, para que tome los cambios del añadido de imagen a productos y del indice optimizado.
+
+`php artisan migrate`
+
 #### Insertar productos de prueba a la tabla products
 El siguiente código inserta productos de prueba en la tabla `products` sin utilizar seeders:
 
@@ -993,6 +998,16 @@ $clientes = [
         'last_name' => 'Smith',
         'email' => 'jsmith@hotmail.com',
     ],
+    [
+        'first_name' => 'Maru',
+        'last_name' => 'Scheffer',
+        'email' => 'mscheffer@hotmail.com',
+    ],
+    [
+        'first_name' => 'Martin',
+        'last_name' => 'Varela',
+        'email' => 'mvarelochoa@hotmail.com',
+    ],
 ];
 
 foreach ($clientes as $infoCliente) {
@@ -1009,6 +1024,39 @@ foreach ($listado as $customer) {
 }
 
 echo "\n\nTotal customers: " . $listado->count() . "\n";
+```
+
+> [!WARNING]
+> Hay que modificar el modelo de customers para que no de error la inserción masiva de registros.
+> Fue propuesto como practica en la clase.
+
+```php
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+
+class Customer extends Model
+{
+    use HasFactory;
+
+    protected $fillable = [
+        'first_name',
+        'last_name',
+        'email',
+        'phone',
+        'birth_date',
+        'is_premium',
+    ];
+
+    protected $dates=['birth_date', 'created_at', 'updated_at'];
+
+    protected $casts = [
+        'is_premium' => 'boolean',
+    ];
+}
 ```
 
 ### 3.3 Caso Práctico: Reseñas de Productos
@@ -1153,8 +1201,22 @@ class Review extends Model
     {
         return $this->belongsTo(Customer::class);
     }
+
+    public function __toString()
+    {
+        return json_encode([
+            'id' => $this->id,
+            'product_id' => $this->product_id,
+            'customer_id' => $this->customer_id,
+            'rating' => $this->rating,
+            'comment' => $this->comment
+        ]);
+    }
 }
 ```
+
+> [!WARNING]
+> Se añadio el método __toString() para evitar errores al usar echo con los objetos Review.
 
 **Actualizar modelo Product para incluir relación con reviews:**
 
@@ -1176,7 +1238,19 @@ public function reviewsCount()
 {
     return $this->reviews()->count();
 }
+
+public function __toString()
+{
+    return json_encode([
+        'id' => $this->id,
+        'name' => $this->name,
+        'price' => $this->price
+    ]);
+}
 ```
+
+> [!WARNING]
+> Se añadio el método __toString() para evitar errores al usar echo con los objetos Product.
 
 **Actualizar modelo Customer:**
 
@@ -1207,6 +1281,7 @@ $app->make(Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 use App\Models\Review;
 use App\Models\Product;
 use App\Models\Customer;
+use Carbon\Carbon;
 
 echo "1. Creando Reseñas\n";
 
@@ -1229,7 +1304,8 @@ echo "\n1.3. Reseñas\n";
 // Forma estándar: crear instancia, asignar relaciones y guardar
 $reseña = Review::firstWhere([
     'product_id' => $iPhone->id,
-    'customer_id' => $john->id
+    'customer_id' => $john->id,
+    'reviewed_at' => Carbon::now()
 ]);
 if ($reseña) {
     $reseña->delete(); // Elimina si ya existe para evitar duplicados en este
@@ -1250,7 +1326,8 @@ $reseña = Review::create([
     'rating' => 4,
     'comment' => 'Buen producto, lo recomiendo.',
     'product_id' => $iPhone->id,
-    'customer_id' => $john->id
+    'customer_id' => $john->id,
+    'reviewed_at' => Carbon::now()
 ]);
 echo "$reseña\n";
 
@@ -1264,7 +1341,8 @@ $reseña = $iPhone->reviews()->updateOrCreate(
     [
         'rating' => 3,
         'comment' => 'El producto está bien, pero esperaba más.',
-        'customer_id' => $john->id
+        'customer_id' => $john->id,
+        'reviewed_at' => Carbon::now()
     ]
 );
 
@@ -1274,7 +1352,8 @@ $iPhone->reviews()->updateOrCreate(
     ],
     [
         'rating' => 2,
-        'comment' => 'No estoy satisfecho con el producto.'
+        'comment' => 'No estoy satisfecho con el producto.',
+        'reviewed_at' => Carbon::now()
     ]
 );
 
@@ -1289,6 +1368,10 @@ foreach ($reseñasIphone as $r) {
 
 echo "Promedio de calificaciones para {$iPhone->name}: " . $iPhone->averageRating() . "\n";
 ```
+
+> [!WARNING]
+> Se añadio la actualización de la fecha de reviewed_at, la cual no es gestionada automaticamente como si lo hacen updated_at y created_at.
+
 ## Ejercicios para Practicar
 
 ### Ejercicio 1: Ampliar el modelo Customer
