@@ -16,7 +16,7 @@ class DocumentationController extends Controller
 
         if (!File::exists($readmePath)) {
             return response()->view('documentation.not-found', [
-                'title' => 'Documentación Completa del API',
+                'title' => 'Documentación del API',
                 'file' => 'API_COMPLETE_DOCUMENTATION.md'
             ], 404);
         }
@@ -24,9 +24,9 @@ class DocumentationController extends Controller
         $content = File::get($readmePath);
 
         return view('documentation.markdown', [
-            'title' => 'Documentación Completa del API',
+            'title' => 'Documentación del API',
             'content' => $content,
-            'backUrl' => '/api-client'
+            'backUrl' => env('API_CLIENT_ROUTE', '/api-client')
         ]);
     }
 
@@ -49,7 +49,7 @@ class DocumentationController extends Controller
         return view('documentation.markdown', [
             'title' => 'Resumen Completo de Implementaciones',
             'content' => $content,
-            'backUrl' => '/api-client'
+            'backUrl' => env('API_CLIENT_ROUTE', '/api-client')
         ]);
     }
 
@@ -62,7 +62,7 @@ class DocumentationController extends Controller
 
         if (!File::exists($readmePath)) {
             return response()->view('documentation.not-found', [
-                'title' => 'Componentes Técnicos',
+                'title' => 'Componentes',
                 'file' => 'TECHNICAL_COMPONENTS_README.md'
             ], 404);
         }
@@ -70,9 +70,9 @@ class DocumentationController extends Controller
         $content = File::get($readmePath);
 
         return view('documentation.markdown', [
-            'title' => 'Documentación de Componentes Técnicos',
+            'title' => 'Documentación de Componentes',
             'content' => $content,
-            'backUrl' => '/api-client'
+            'backUrl' => env('API_CLIENT_ROUTE', '/api-client')
         ]);
     }
 
@@ -95,7 +95,7 @@ class DocumentationController extends Controller
         return view('documentation.markdown', [
             'title' => 'Guía de Personalización de Emails',
             'content' => $content,
-            'backUrl' => '/api-client'
+            'backUrl' => env('API_CLIENT_ROUTE', '/api-client')
         ]);
     }
 
@@ -118,7 +118,7 @@ class DocumentationController extends Controller
         return view('documentation.markdown', [
             'title' => 'Ejemplos y Casos de Uso - Upload de Archivos',
             'content' => $content,
-            'backUrl' => '/api-client'
+            'backUrl' => env('API_CLIENT_ROUTE', '/api-client')
         ]);
     }
 
@@ -168,7 +168,7 @@ class DocumentationController extends Controller
         return view('documentation.index', [
             'title' => 'Índice de Documentación',
             'docs' => collect($availableDocs)->groupBy('category'),
-            'backUrl' => '/api-client'
+            'backUrl' => env('API_CLIENT_ROUTE', '/api-client')
         ]);
     }
 }

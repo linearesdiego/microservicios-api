@@ -6,7 +6,7 @@
     <title>{{ $title }} - Laravel API Client</title>
 
     <!-- CSS Unificado para tema oscuro de documentación -->
-    <link rel="stylesheet" href="css/documentation-dark-theme.css">
+    <link rel="stylesheet" href="/css/documentation-dark-theme.css">
 
     <!-- Marked.js - Renderizador de Markdown -->
     <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
