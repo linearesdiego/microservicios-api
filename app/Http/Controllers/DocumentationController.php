@@ -12,7 +12,7 @@ class DocumentationController extends Controller
      */
     public function apiCompleteDocs()
     {
-        $readmePath = base_path('API_COMPLETE_DOCUMENTATION.md');
+        $readmePath = base_path('docs/API_COMPLETE_DOCUMENTATION.md');
 
         if (!File::exists($readmePath)) {
             return response()->view('documentation.not-found', [
@@ -35,7 +35,7 @@ class DocumentationController extends Controller
      */
     public function implementationSummaryDocs()
     {
-        $readmePath = base_path('IMPLEMENTATION_COMPLETE_SUMMARY.md');
+        $readmePath = base_path('docs/IMPLEMENTATION_COMPLETE_SUMMARY.md');
 
         if (!File::exists($readmePath)) {
             return response()->view('documentation.not-found', [
@@ -58,7 +58,7 @@ class DocumentationController extends Controller
      */
     public function technicalComponentsDocs()
     {
-        $readmePath = base_path('TECHNICAL_COMPONENTS_README.md');
+        $readmePath = base_path('docs/TECHNICAL_COMPONENTS_README.md');
 
         if (!File::exists($readmePath)) {
             return response()->view('documentation.not-found', [
@@ -81,7 +81,7 @@ class DocumentationController extends Controller
      */
     public function emailCustomizationDocs()
     {
-        $readmePath = base_path('EMAIL_CUSTOMIZATION_GUIDE.md');
+        $readmePath = base_path('docs/EMAIL_CUSTOMIZATION_GUIDE.md');
 
         if (!File::exists($readmePath)) {
             return response()->view('documentation.not-found', [
@@ -104,7 +104,7 @@ class DocumentationController extends Controller
      */
     public function fileUploadExamplesDocs()
     {
-        $readmePath = base_path('FILE_UPLOAD_EXAMPLES.md');
+        $readmePath = base_path('docs/FILE_UPLOAD_EXAMPLES.md');
 
         if (!File::exists($readmePath)) {
             return response()->view('documentation.not-found', [
@@ -129,7 +129,7 @@ class DocumentationController extends Controller
     {
         $availableDocs = [
             [
-                'title' => 'Documentación Completa del API',
+                'title' => 'Documentación del API',
                 'description' => 'Documentación unificada con todos los endpoints, ejemplos de cliente y manejo de errores',
                 'route' => 'docs.api-complete',
                 'category' => 'Principal',

@@ -1,4 +1,4 @@
-# Documentación de API - Microservicios Laravel
+# Documentación del API - Microservicios Laravel
 
 ## Índice
 - [Estructura de Respuestas](#estructura-de-respuestas)
