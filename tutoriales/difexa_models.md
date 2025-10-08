@@ -1,8 +1,8 @@
-# Tutorial Laravel 12: Migraciones y Modelos Eloquent
+# Migraciones y Modelos Difexa
 
 ## Introducción
 
-En este tutorial aprenderás a crear las migraciones y modelos Eloquent para un sistema de gestión de contenido basado en el diagrama proporcionado. Trabajaremos con entidades principales, tablas pivot y enumeraciones (enums).
+En este tutorial aprenderás a crear las migraciones y modelos Eloquent para un sistema de gestión de contenido Difexa. Trabajaremos con entidades principales, tablas pivot y enumeraciones (enums).
 
 ## ¿Qué son las Migraciones?
 
