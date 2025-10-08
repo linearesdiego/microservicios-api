@@ -17,6 +17,8 @@ class DatabaseSeeder extends Seeder
             ['email' => env('ADMIN_EMAIL')],
             [
                 'name' => env('ADMIN_NAME'),
+                'first_name' => env('ADMIN_FIRST_NAME'),
+                'last_name' => env('ADMIN_LAST_NAME'),
                 'password' => bcrypt(env('ADMIN_PASSWORD'))
             ]
         );
