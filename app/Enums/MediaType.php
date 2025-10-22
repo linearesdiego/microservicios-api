@@ -4,23 +4,21 @@ namespace App\Enums;
 
 enum MediaType: string
 {
-    case PHISICAL_SCREEN = 'phisical_screen';
+    case PHYSICAL_SCREEN = 'physical_screen';
     case SOCIAL_MEDIA = 'social_media';
     case EDITORIAL_PLATFORM = 'editorial_platform';
 
-
     public static function values(): array
     {
-        return array_map(fn(MediaType $type) => $type->value, self::cases());
+        return array_column(self::cases(), 'value');
     }
-
 
     public function label(): string
     {
         return match ($this) {
-            self::PHISICAL_SCREEN => 'Pantalla física',
-            self::SOCIAL_MEDIA => 'Red social',
-            self::EDITORIAL_PLATFORM => 'Plataforma editorial',
+            self::PHYSICAL_SCREEN => 'Pantalla Física',
+            self::SOCIAL_MEDIA => 'Redes Sociales',
+            self::EDITORIAL_PLATFORM => 'Plataforma Editorial',
         };
     }
 }

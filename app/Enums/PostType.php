@@ -4,26 +4,25 @@ namespace App\Enums;
 
 enum PostType: string
 {
-    case ARTICLE = 'article';
+    case TEXT = 'text';
     case VIDEO = 'video';
-    case PODCAST = 'podcast';
+    case AUDIO = 'audio';
     case IMAGE = 'image';
-
+    case MULTIMEDIA = 'multimedia';
 
     public static function values(): array
     {
-        return array_map(fn(PostType $type) => $type->value, self::cases());
+        return array_column(self::cases(), 'value');
     }
-
 
     public function label(): string
     {
         return match ($this) {
-            self::ARTICLE => 'Artículo',
+            self::TEXT => 'Texto',
             self::VIDEO => 'Video',
-            self::PODCAST => 'Podcast',
+            self::AUDIO => 'Audio',
             self::IMAGE => 'Imagen',
+            self::MULTIMEDIA => 'Multimedia',
         };
     }
 }
-
