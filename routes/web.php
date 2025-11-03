@@ -1,9 +1,31 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\UIDemoController;
+use App\Http\Controllers\UIEventController;
 use App\Http\Controllers\DocumentationController;
 
-Route::get('/', fn() => view('api-client'));
+// Demo route - Default landing demo
+Route::get('/', fn() => view('demo', [
+    'demo' => 'landing-demo',
+    'reset' => false
+]));
+
+// Demo route - Dynamic demo viewer
+Route::get('/{demo}/{reset?}', function (string $demo, bool $reset = false) {
+    return view('demo', [
+        'demo' => $demo,
+        'reset' => $reset
+    ]);
+})->where('demo', 'landing-demo|demo-ui|input-demo|select-demo|checkbox-demo|form-demo|button-demo|table-demo|modal-demo|demo-menu')->name('demo');
+
+// Demo UI API routes - Unified controller for all demo services
+Route::get('/api/{demo}/{reset?}', [UIDemoController::class, 'show'])
+    ->where('demo', 'landing-demo|demo-ui|input-demo|select-demo|checkbox-demo|form-demo|button-demo|table-demo|modal-demo|demo-menu')
+    ->name('api.demo');
+
+// UI Event Handler
+Route::post('/api/ui-event', [UIEventController::class, 'handleEvent'])->name('ui.event');
 
 // Ruta para previsualizar emails (solo para desarrollo)
 if (app()->environment('local')) {
@@ -29,9 +51,6 @@ if (app()->environment('local')) {
         return $notification->toMail($user);
     })->name('email.preview.verify');
 }
-
-// Ruta para el cliente API
-// Route::get('/api-client', fn() => view('api-client'))->name('api-client');
 
 // Rutas para documentación
 Route::prefix('docs')->group(function () {
