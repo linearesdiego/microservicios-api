@@ -30,9 +30,6 @@ if (app()->environment('local')) {
     })->name('email.preview.verify');
 }
 
-// Ruta para el cliente API
-// Route::get('/api-client', fn() => view('api-client'))->name('api-client');
-
 // Rutas para documentación
 Route::prefix('docs')->group(function () {
     // Índice principal de documentación
