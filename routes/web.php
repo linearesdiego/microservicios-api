@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\DocumentationController;
+use App\Http\Controllers\LogViewerController;
 
 Route::get('/', fn() => view('api-client'));
 
@@ -47,4 +48,12 @@ Route::prefix('docs')->group(function () {
     // Rutas de compatibilidad con enlaces antiguos (redirects)
     Route::get('/api-client', fn() => redirect()->route('docs.api-complete'))->name('docs.api-client.redirect');
     Route::get('/css-structure', fn() => redirect()->route('docs.technical-components'))->name('docs.css-structure.redirect');
+});
+
+// Log viewer routes
+Route::prefix('logs')->group(function () {
+    Route::get('/', [LogViewerController::class, 'index'])->name('logs.index');
+    Route::get('/content', [LogViewerController::class, 'getContent'])->name('logs.content');
+    Route::get('/download', [LogViewerController::class, 'download'])->name('logs.download');
+    Route::post('/clear', [LogViewerController::class, 'clear'])->name('logs.clear');
 });
