@@ -784,7 +784,7 @@ body.modal-open #menu {
     /* Don't set left or right here - let position classes handle it */
     background: white;
     border: none;
-    border-radius: 12px;
+    border-radius: 4px;
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
     min-width: 240px;
     z-index: 9999; /* Very high z-index to appear above all containers */

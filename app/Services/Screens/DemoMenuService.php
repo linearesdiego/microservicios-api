@@ -100,7 +100,8 @@ class DemoMenuService extends AbstractUIService
     private function buildUserMenu(): UIElement
     {
         $userMenu = UIBuilder::menuDropdown('user_menu')
-            ->trigger('👤')
+            ->trigger('⚙')  // Ícono de engranaje/settings - más minimalista
+            // Otras opciones: '●' '◉' '≡' '👤'
             ->position('bottom-right')  // Alinear al borde derecho para que se despliegue a la izquierda
             ->width(180);  // Ancho fijo para el dropdown
 
