@@ -4,12 +4,14 @@ namespace App\Services\UI\Components;
 
 use Illuminate\Support\Facades\Log;
 use App\Services\UI\Enums\LayoutType;
+use App\Services\UI\Enums\JustifyContent;
+use App\Services\UI\Enums\AlignItems;
 use App\Services\UI\Contracts\UIElement;
 use App\Services\UI\Support\UIIdGenerator;
 
 /**
  * Composite UI Container that can hold and manage child UI elements
- * 
+ *
  * This class implements the Composite pattern, allowing UI elements to be
  * organized in a tree structure. It provides methods to add, remove, update,
  * and find child elements, as well as recursive JSON serialization.
@@ -186,7 +188,7 @@ class UIContainer implements UIElement
 
     /**
      * Get the container name
-     * 
+     *
      * @return string|null Container name or null if not set
      */
     public function getName(): ?string
@@ -229,7 +231,7 @@ class UIContainer implements UIElement
 
     /**
      * Set the name for this container
-     * 
+     *
      * @param string|null $name The container name
      * @return self For method chaining
      */
@@ -241,7 +243,7 @@ class UIContainer implements UIElement
 
     /**
      * Set the title for this container
-     * 
+     *
      * @param string|null $title The container title
      * @return self For method chaining
      */
@@ -271,7 +273,7 @@ class UIContainer implements UIElement
 
     /**
      * Set the parent reference for this container
-     * 
+     *
      * @param int|string|null $parent The parent (int = parent ID, string = parent name, null = delete)
      * @return self For method chaining
      */
@@ -282,7 +284,7 @@ class UIContainer implements UIElement
 
     /**
      * Set the layout type for this container
-     * 
+     *
      * @param LayoutType $layout The layout type (VERTICAL or HORIZONTAL)
      * @return self For method chaining
      */
@@ -294,7 +296,7 @@ class UIContainer implements UIElement
 
     /**
      * Set the title for this container
-     * 
+     *
      * @param string $title The container title
      * @return self For method chaining
      */
@@ -306,7 +308,7 @@ class UIContainer implements UIElement
 
     /**
      * Add a child element to this container
-     * 
+     *
      * @param UIElement $element The element to add
      * @return self For method chaining
      * @throws \InvalidArgumentException If element with same ID already exists
@@ -330,7 +332,7 @@ class UIContainer implements UIElement
 
     /**
      * Add multiple child elements to this container
-     * 
+     *
      * @param array<UIElement> $elements Array of elements to add
      * @return self For method chaining
      */
@@ -346,7 +348,7 @@ class UIContainer implements UIElement
 
     /**
      * Remove a child element from this container by ID
-     * 
+     *
      * @param int|string $elementId The ID of the element to remove
      * @return self For method chaining
      * @throws \InvalidArgumentException If element not found
@@ -370,7 +372,7 @@ class UIContainer implements UIElement
     /**
      * Remove a child element from this container by ID (silent version)
      * Returns true if element was removed, false if not found
-     * 
+     *
      * @param int|string $elementId The ID of the element to remove
      * @return bool True if removed, false if not found
      */
@@ -389,7 +391,7 @@ class UIContainer implements UIElement
 
     /**
      * Update a child element by replacing it with a new element
-     * 
+     *
      * @param int|string $elementId The ID of the element to update
      * @param UIElement $newElement The new element to replace with
      * @return self For method chaining
@@ -416,7 +418,7 @@ class UIContainer implements UIElement
 
     /**
      * Find a child element by ID (searches recursively through the tree)
-     * 
+     *
      * @param int|string $elementId The ID of the element to find
      * @return UIElement|null The found element, or null if not found
      */
@@ -443,7 +445,7 @@ class UIContainer implements UIElement
 
     /**
      * Check if this container has a specific child element
-     * 
+     *
      * @param int|string $elementId The ID of the element to check
      * @return bool True if element exists as direct child, false otherwise
      */
@@ -455,7 +457,7 @@ class UIContainer implements UIElement
 
     /**
      * Get all direct child elements
-     * 
+     *
      * @return array<UIElement> Array of child elements
      */
     public function getChildren(): array
@@ -465,7 +467,7 @@ class UIContainer implements UIElement
 
     /**
      * Get the number of direct children
-     * 
+     *
      * @return int The number of children
      */
     public function count(): int
@@ -475,7 +477,7 @@ class UIContainer implements UIElement
 
     /**
      * Remove all child elements
-     * 
+     *
      * @return self For method chaining
      */
     public function clear(): self
@@ -490,7 +492,7 @@ class UIContainer implements UIElement
 
     /**
      * Set flex direction
-     * 
+     *
      * @param string $direction Direction: row, row-reverse, column, column-reverse
      * @return self For method chaining
      */
@@ -502,31 +504,35 @@ class UIContainer implements UIElement
 
     /**
      * Set justify content (main axis alignment)
-     * 
-     * @param string $justify Values: flex-start, flex-end, center, space-between, space-around, space-evenly
+     *
+     * @param JustifyContent|string $justify Alignment value
      * @return self For method chaining
      */
-    public function justifyContent(string $justify): self
+    public function justifyContent(JustifyContent|string $justify): self
     {
-        $this->config['justify_content'] = $justify;
+        $this->config['justify_content'] = $justify instanceof JustifyContent
+            ? $justify->value
+            : $justify;
         return $this;
     }
 
     /**
      * Set align items (cross axis alignment)
-     * 
-     * @param string $align Values: flex-start, flex-end, center, baseline, stretch
+     *
+     * @param AlignItems|string $align Alignment value
      * @return self For method chaining
      */
-    public function alignItems(string $align): self
+    public function alignItems(AlignItems|string $align): self
     {
-        $this->config['align_items'] = $align;
+        $this->config['align_items'] = $align instanceof AlignItems
+            ? $align->value
+            : $align;
         return $this;
     }
 
     /**
      * Set align content (multi-line alignment)
-     * 
+     *
      * @param string $align Values: flex-start, flex-end, center, space-between, space-around, stretch
      * @return self For method chaining
      */
@@ -538,7 +544,7 @@ class UIContainer implements UIElement
 
     /**
      * Set flex wrap
-     * 
+     *
      * @param string $wrap Values: nowrap, wrap, wrap-reverse
      * @return self For method chaining
      */
@@ -550,7 +556,7 @@ class UIContainer implements UIElement
 
     /**
      * Set flex grow factor
-     * 
+     *
      * @param int|float $grow Grow factor (typically 0-1)
      * @return self For method chaining
      */
@@ -562,7 +568,7 @@ class UIContainer implements UIElement
 
     /**
      * Set flex shrink factor
-     * 
+     *
      * @param int|float $shrink Shrink factor (typically 0-1)
      * @return self For method chaining
      */
@@ -574,7 +580,7 @@ class UIContainer implements UIElement
 
     /**
      * Set flex basis (initial size)
-     * 
+     *
      * @param string $basis Size value (px, %, auto, etc)
      * @return self For method chaining
      */
@@ -586,7 +592,7 @@ class UIContainer implements UIElement
 
     /**
      * Set order for flex item
-     * 
+     *
      * @param int $order Order value
      * @return self For method chaining
      */
@@ -602,7 +608,7 @@ class UIContainer implements UIElement
 
     /**
      * Set grid template columns
-     * 
+     *
      * @param string $template Template string (e.g., '1fr 2fr', 'repeat(3, 1fr)', '100px auto')
      * @return self For method chaining
      */
@@ -614,7 +620,7 @@ class UIContainer implements UIElement
 
     /**
      * Set grid template rows
-     * 
+     *
      * @param string $template Template string
      * @return self For method chaining
      */
@@ -626,7 +632,7 @@ class UIContainer implements UIElement
 
     /**
      * Set grid template areas
-     * 
+     *
      * @param array|string $areas Area names or array of area strings
      * @return self For method chaining
      */
@@ -641,7 +647,7 @@ class UIContainer implements UIElement
 
     /**
      * Set grid auto columns
-     * 
+     *
      * @param string $size Size value (auto, minmax(), etc)
      * @return self For method chaining
      */
@@ -653,7 +659,7 @@ class UIContainer implements UIElement
 
     /**
      * Set grid auto rows
-     * 
+     *
      * @param string $size Size value
      * @return self For method chaining
      */
@@ -665,7 +671,7 @@ class UIContainer implements UIElement
 
     /**
      * Set grid auto flow
-     * 
+     *
      * @param string $flow Values: row, column, row dense, column dense
      * @return self For method chaining
      */
@@ -677,7 +683,7 @@ class UIContainer implements UIElement
 
     /**
      * Set grid column span/position
-     * 
+     *
      * @param string $column Column value (e.g., '1 / 3', 'span 2')
      * @return self For method chaining
      */
@@ -689,7 +695,7 @@ class UIContainer implements UIElement
 
     /**
      * Set grid row span/position
-     * 
+     *
      * @param string $row Row value
      * @return self For method chaining
      */
@@ -701,7 +707,7 @@ class UIContainer implements UIElement
 
     /**
      * Set grid area name
-     * 
+     *
      * @param string $area Area name
      * @return self For method chaining
      */
@@ -717,7 +723,7 @@ class UIContainer implements UIElement
 
     /**
      * Set gap (spacing between children)
-     * 
+     *
      * @param string $gap Gap value (px, rem, etc)
      * @return self For method chaining
      */
@@ -729,7 +735,7 @@ class UIContainer implements UIElement
 
     /**
      * Set row gap
-     * 
+     *
      * @param string $gap Row gap value
      * @return self For method chaining
      */
@@ -741,7 +747,7 @@ class UIContainer implements UIElement
 
     /**
      * Set column gap
-     * 
+     *
      * @param string $gap Column gap value
      * @return self For method chaining
      */
@@ -757,7 +763,7 @@ class UIContainer implements UIElement
 
     /**
      * Set padding (all sides)
-     * 
+     *
      * @param string $padding Padding value
      * @return self For method chaining
      */
@@ -769,7 +775,7 @@ class UIContainer implements UIElement
 
     /**
      * Set padding for individual sides
-     * 
+     *
      * @param string|null $top Top padding
      * @param string|null $right Right padding
      * @param string|null $bottom Bottom padding
@@ -787,7 +793,7 @@ class UIContainer implements UIElement
 
     /**
      * Set top padding
-     * 
+     *
      * @param string $padding Padding value
      * @return self For method chaining
      */
@@ -799,7 +805,7 @@ class UIContainer implements UIElement
 
     /**
      * Set right padding
-     * 
+     *
      * @param string $padding Padding value
      * @return self For method chaining
      */
@@ -811,7 +817,7 @@ class UIContainer implements UIElement
 
     /**
      * Set bottom padding
-     * 
+     *
      * @param string $padding Padding value
      * @return self For method chaining
      */
@@ -823,7 +829,7 @@ class UIContainer implements UIElement
 
     /**
      * Set left padding
-     * 
+     *
      * @param string $padding Padding value
      * @return self For method chaining
      */
@@ -839,7 +845,7 @@ class UIContainer implements UIElement
 
     /**
      * Set margin (all sides)
-     * 
+     *
      * @param string $margin Margin value
      * @return self For method chaining
      */
@@ -851,7 +857,7 @@ class UIContainer implements UIElement
 
     /**
      * Set margin for individual sides
-     * 
+     *
      * @param string|null $top Top margin
      * @param string|null $right Right margin
      * @param string|null $bottom Bottom margin
@@ -869,7 +875,7 @@ class UIContainer implements UIElement
 
     /**
      * Set top margin
-     * 
+     *
      * @param string $margin Margin value
      * @return self For method chaining
      */
@@ -881,7 +887,7 @@ class UIContainer implements UIElement
 
     /**
      * Set right margin
-     * 
+     *
      * @param string $margin Margin value
      * @return self For method chaining
      */
@@ -893,7 +899,7 @@ class UIContainer implements UIElement
 
     /**
      * Set bottom margin
-     * 
+     *
      * @param string $margin Margin value
      * @return self For method chaining
      */
@@ -905,7 +911,7 @@ class UIContainer implements UIElement
 
     /**
      * Set left margin
-     * 
+     *
      * @param string $margin Margin value
      * @return self For method chaining
      */
@@ -921,7 +927,7 @@ class UIContainer implements UIElement
 
     /**
      * Set width
-     * 
+     *
      * @param string $width Width value (px, %, vh, auto, etc)
      * @return self For method chaining
      */
@@ -933,7 +939,7 @@ class UIContainer implements UIElement
 
     /**
      * Set height
-     * 
+     *
      * @param string $height Height value
      * @return self For method chaining
      */
@@ -945,7 +951,7 @@ class UIContainer implements UIElement
 
     /**
      * Set minimum width
-     * 
+     *
      * @param string $width Min width value
      * @return self For method chaining
      */
@@ -957,7 +963,7 @@ class UIContainer implements UIElement
 
     /**
      * Set minimum height
-     * 
+     *
      * @param string $height Min height value
      * @return self For method chaining
      */
@@ -969,7 +975,7 @@ class UIContainer implements UIElement
 
     /**
      * Set maximum width
-     * 
+     *
      * @param string $width Max width value
      * @return self For method chaining
      */
@@ -981,7 +987,7 @@ class UIContainer implements UIElement
 
     /**
      * Set maximum height
-     * 
+     *
      * @param string $height Max height value
      * @return self For method chaining
      */
@@ -997,7 +1003,7 @@ class UIContainer implements UIElement
 
     /**
      * Set background color
-     * 
+     *
      * @param string $color Color value (hex, rgb, named)
      * @return self For method chaining
      */
@@ -1009,7 +1015,7 @@ class UIContainer implements UIElement
 
     /**
      * Set background image
-     * 
+     *
      * @param string $url Image URL
      * @return self For method chaining
      */
@@ -1021,7 +1027,7 @@ class UIContainer implements UIElement
 
     /**
      * Set background size
-     * 
+     *
      * @param string $size Size value (cover, contain, auto, etc)
      * @return self For method chaining
      */
@@ -1033,7 +1039,7 @@ class UIContainer implements UIElement
 
     /**
      * Set background position
-     * 
+     *
      * @param string $position Position value (center, top, bottom, etc)
      * @return self For method chaining
      */
@@ -1045,7 +1051,7 @@ class UIContainer implements UIElement
 
     /**
      * Set border
-     * 
+     *
      * @param string $border Border value (e.g., '1px solid #ccc')
      * @return self For method chaining
      */
@@ -1057,7 +1063,7 @@ class UIContainer implements UIElement
 
     /**
      * Set border radius
-     * 
+     *
      * @param string $radius Radius value
      * @return self For method chaining
      */
@@ -1069,7 +1075,7 @@ class UIContainer implements UIElement
 
     /**
      * Set box shadow
-     * 
+     *
      * @param string $shadow Shadow value
      * @return self For method chaining
      */
@@ -1081,7 +1087,7 @@ class UIContainer implements UIElement
 
     /**
      * Set opacity
-     * 
+     *
      * @param float $opacity Opacity value (0-1)
      * @return self For method chaining
      */
@@ -1093,7 +1099,7 @@ class UIContainer implements UIElement
 
     /**
      * Center the container horizontally using margin auto
-     * 
+     *
      * @return self For method chaining
      */
     public function centerHorizontal(): self
@@ -1109,7 +1115,7 @@ class UIContainer implements UIElement
 
     /**
      * Set position type
-     * 
+     *
      * @param string $position Position value (static, relative, absolute, fixed, sticky)
      * @return self For method chaining
      */
@@ -1121,7 +1127,7 @@ class UIContainer implements UIElement
 
     /**
      * Set top position
-     * 
+     *
      * @param string $top Top value
      * @return self For method chaining
      */
@@ -1133,7 +1139,7 @@ class UIContainer implements UIElement
 
     /**
      * Set right position
-     * 
+     *
      * @param string $right Right value
      * @return self For method chaining
      */
@@ -1145,7 +1151,7 @@ class UIContainer implements UIElement
 
     /**
      * Set bottom position
-     * 
+     *
      * @param string $bottom Bottom value
      * @return self For method chaining
      */
@@ -1157,7 +1163,7 @@ class UIContainer implements UIElement
 
     /**
      * Set left position
-     * 
+     *
      * @param string $left Left value
      * @return self For method chaining
      */
@@ -1169,7 +1175,7 @@ class UIContainer implements UIElement
 
     /**
      * Set z-index
-     * 
+     *
      * @param int $zIndex Z-index value
      * @return self For method chaining
      */
@@ -1185,7 +1191,7 @@ class UIContainer implements UIElement
 
     /**
      * Set overflow behavior
-     * 
+     *
      * @param string $overflow Overflow value (visible, hidden, scroll, auto)
      * @return self For method chaining
      */
@@ -1197,7 +1203,7 @@ class UIContainer implements UIElement
 
     /**
      * Set horizontal overflow
-     * 
+     *
      * @param string $overflow Overflow value
      * @return self For method chaining
      */
@@ -1209,7 +1215,7 @@ class UIContainer implements UIElement
 
     /**
      * Set vertical overflow
-     * 
+     *
      * @param string $overflow Overflow value
      * @return self For method chaining
      */
@@ -1221,7 +1227,7 @@ class UIContainer implements UIElement
 
     /**
      * Set scroll behavior
-     * 
+     *
      * @param string $behavior Scroll behavior (auto, smooth)
      * @return self For method chaining
      */
@@ -1237,7 +1243,7 @@ class UIContainer implements UIElement
 
     /**
      * Set display property
-     * 
+     *
      * @param string $display Display value (block, inline, inline-block, flex, grid, none)
      * @return self For method chaining
      */
@@ -1253,7 +1259,7 @@ class UIContainer implements UIElement
 
     /**
      * Set responsive configuration for different breakpoints
-     * 
+     *
      * @param array $config Responsive configuration [breakpoint => config]
      * @return self For method chaining
      */
@@ -1265,7 +1271,7 @@ class UIContainer implements UIElement
 
     /**
      * Hide container on specific breakpoints
-     * 
+     *
      * @param array $breakpoints Breakpoints to hide on (mobile, tablet, desktop)
      * @return self For method chaining
      */
@@ -1277,7 +1283,7 @@ class UIContainer implements UIElement
 
     /**
      * Show container only on specific breakpoints
-     * 
+     *
      * @param array $breakpoints Breakpoints to show on
      * @return self For method chaining
      */
@@ -1293,7 +1299,7 @@ class UIContainer implements UIElement
 
     /**
      * Add custom CSS class
-     * 
+     *
      * @param string $class CSS class name
      * @return self For method chaining
      */
@@ -1305,7 +1311,7 @@ class UIContainer implements UIElement
 
     /**
      * Add custom inline style
-     * 
+     *
      * @param string $style CSS style string
      * @return self For method chaining
      */
@@ -1317,7 +1323,7 @@ class UIContainer implements UIElement
 
     /**
      * Add custom data attributes
-     * 
+     *
      * @param array $attributes Key-value pairs of data attributes
      * @return self For method chaining
      */
@@ -1333,7 +1339,7 @@ class UIContainer implements UIElement
 
     /**
      * Configure as flex row layout
-     * 
+     *
      * @return self For method chaining
      */
     public function flexRow(): self
@@ -1343,7 +1349,7 @@ class UIContainer implements UIElement
 
     /**
      * Configure as flex column layout
-     * 
+     *
      * @return self For method chaining
      */
     public function flexColumn(): self
@@ -1353,7 +1359,7 @@ class UIContainer implements UIElement
 
     /**
      * Center content (flex justify-content and align-items center)
-     * 
+     *
      * @return self For method chaining
      */
     public function centerContent(): self
@@ -1363,7 +1369,7 @@ class UIContainer implements UIElement
 
     /**
      * Quick grid setup
-     * 
+     *
      * @param string $columns Grid columns template
      * @param string|null $rows Grid rows template
      * @return self For method chaining
@@ -1379,7 +1385,7 @@ class UIContainer implements UIElement
 
     /**
      * Create equal column grid
-     * 
+     *
      * @param int $columns Number of columns
      * @return self For method chaining
      */
@@ -1390,7 +1396,7 @@ class UIContainer implements UIElement
 
     /**
      * Set all spacing (gap and padding) at once
-     * 
+     *
      * @param string $value Spacing value
      * @return self For method chaining
      */
@@ -1401,7 +1407,7 @@ class UIContainer implements UIElement
 
     /**
      * Make container full width
-     * 
+     *
      * @return self For method chaining
      */
     public function fullWidth(): self
@@ -1411,7 +1417,7 @@ class UIContainer implements UIElement
 
     /**
      * Make container full height
-     * 
+     *
      * @return self For method chaining
      */
     public function fullHeight(): self
@@ -1421,7 +1427,7 @@ class UIContainer implements UIElement
 
     /**
      * Make container scrollable
-     * 
+     *
      * @param string $direction Direction (both, x, y)
      * @return self For method chaining
      */
@@ -1438,7 +1444,7 @@ class UIContainer implements UIElement
 
     /**
      * Apply rounded corners
-     * 
+     *
      * @param string|int $radius Radius value (e.g., '8px', 8, 'medium') or integer for pixels
      * @return self For method chaining
      */
@@ -1452,7 +1458,7 @@ class UIContainer implements UIElement
 
     /**
      * Apply shadow effect
-     * 
+     *
      * @param string|int $intensity Shadow intensity (0=none, 1-3=levels, 'light', 'medium', 'heavy', or custom CSS)
      * @return self For method chaining
      */
@@ -1480,7 +1486,7 @@ class UIContainer implements UIElement
 
     /**
      * Hide container (display: none)
-     * 
+     *
      * @return self For method chaining
      */
     public function hide(): self
@@ -1490,7 +1496,7 @@ class UIContainer implements UIElement
 
     /**
      * Show container (display: block)
-     * 
+     *
      * @return self For method chaining
      */
     public function show(): self
@@ -1500,7 +1506,7 @@ class UIContainer implements UIElement
 
     /**
      * {@inheritDoc}
-     * 
+     *
      * Converts this container and all its children to a flat JSON structure
      * All components are returned at the same level, with 'parent' indicating parent-child relationships
      * Null values are filtered out from the configuration
@@ -1544,7 +1550,7 @@ class UIContainer implements UIElement
 
     /**
      * Convert to array (alias for toJson for backward compatibility)
-     * 
+     *
      * @return array
      */
     public function build(): array
@@ -1555,7 +1561,7 @@ class UIContainer implements UIElement
     /**
      * Detecta automáticamente la clase que está invocando el builder
      * Busca en el stack trace la primera clase fuera del namespace UI
-     * 
+     *
      * @return string El nombre completo con namespace de la clase invocante
      */
     private function detectCallingContext(): string
@@ -1579,7 +1585,7 @@ class UIContainer implements UIElement
     /**
      * Genera ID determinístico basado en contexto + nombre
      * Siempre retorna el mismo ID para el mismo contexto + nombre
-     * 
+     *
      * @param string $context Nombre completo de la clase invocante
      * @param string $name Nombre del contenedor
      * @return int ID determinístico
@@ -1598,7 +1604,7 @@ class UIContainer implements UIElement
 
     /**
      * Obtener offset del contexto (mismo cálculo que UIIdGenerator)
-     * 
+     *
      * @param string $context Nombre completo de la clase
      * @return int Offset único para el contexto
      */
@@ -1620,7 +1626,7 @@ class UIContainer implements UIElement
 
     /**
      * Buscar componente hijo por nombre (recursivo)
-     * 
+     *
      * @param string $name Nombre del componente a buscar
      * @return UIElement|null Componente encontrado o null
      */
@@ -1652,7 +1658,7 @@ class UIContainer implements UIElement
 
     /**
      * Buscar componente hijo por ID (recursivo)
-     * 
+     *
      * @param int $id ID del componente a buscar
      * @return UIElement|null Componente encontrado o null
      */

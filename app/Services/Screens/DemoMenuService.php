@@ -5,10 +5,14 @@ namespace App\Services\Screens;
 use App\Services\UI\UIBuilder;
 use App\Services\UI\Enums\TimeUnit;
 use App\Services\UI\Enums\DialogType;
+use App\Services\UI\Enums\LayoutType;
+use App\Services\UI\Enums\JustifyContent;
+use App\Services\UI\Enums\AlignItems;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Contracts\UIElement;
 use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Modals\ConfirmDialogService;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Demo Menu Service
@@ -19,15 +23,32 @@ class DemoMenuService extends AbstractUIService
 {
     protected function buildBaseUI(...$params): UIContainer
     {
+        // OPCIÓN 1: Items juntos al inicio (por defecto)
+        // No se especifica justifyContent, usa flex-start por defecto
+
+        // OPCIÓN 2: Primer item a la izquierda, último a la derecha (JUSTIFICADO)
+        // ->justifyContent(JustifyContent::SPACE_BETWEEN)
+
+        // OPCIÓN 3: Ambos items centrados con espacio entre ellos
+        // ->justifyContent(JustifyContent::CENTER)
+        // ->gap('20px')
+
         $menu_placeholder = UIBuilder::container('_menu_placeholder')
             ->parent('menu')
             ->shadow(0)
             ->borderRadius(0)
+            ->layout(LayoutType::HORIZONTAL)
+            ->justifyContent(JustifyContent::SPACE_BETWEEN)  // 👈 Cambiar aquí según necesites
+            ->alignItems(AlignItems::CENTER)  // Alinear verticalmente al centro
+            ->gap('20px')  // Espacio entre items (opcional)
             ->padding(0);
 
         $menu_placeholder->add(
             $this->buildMenu()
+        )->add(
+            $this->buildUserMenu()
         );
+
         return $menu_placeholder;
     }
 
@@ -74,6 +95,26 @@ class DemoMenuService extends AbstractUIService
         $menu->item('About', 'show_about_info', [], 'ℹ️');
 
         return $menu;
+    }
+
+    private function buildUserMenu(): UIElement
+    {
+        $userMenu = UIBuilder::menuDropdown('user_menu')
+            ->trigger('👤')
+            ->position('bottom-right')  // Alinear al borde derecho para que se despliegue a la izquierda
+            ->width(180);  // Ancho fijo para el dropdown
+
+        // Authentication options
+        $userMenu->item('Login', 'show_login_form', [], '🔑');
+        $userMenu->item('Register', 'show_register_form', [], '📝');
+
+        $userMenu->separator();
+
+        // User profile options
+        $userMenu->item('Profile', 'show_profile', [], '👤');
+        $userMenu->item('Logout', 'logout_user', [], '🚪');
+
+        return $userMenu;
     }
 
     // public function getUI(...$params): array
@@ -336,5 +377,159 @@ class DemoMenuService extends AbstractUIService
         );
 
         return $modalUI;
+    }
+
+    // ==================== USER MENU HANDLERS ====================
+
+    /**
+     * Handler for Login form
+     */
+    public function onShowLoginForm(array $params): array
+    {
+        $serviceId = $this->getServiceComponentId();
+
+        $confirmService = app(ConfirmDialogService::class);
+        $modalUI = $confirmService->getUI(
+            type: DialogType::INFO,
+            title: "Login",
+            message: "Aquí se mostrará el formulario de login.\n(Por implementar)",
+            confirmAction: 'close_login_dialog',
+            callerServiceId: $serviceId
+        );
+
+        return $modalUI;
+    }
+
+    /**
+     * Handler to close login dialog
+     */
+    public function onCloseLoginDialog(array $params): array
+    {
+        return [
+            'action' => 'close_modal',
+            'modal_id' => 'confirm_dialog'
+        ];
+    }
+
+    /**
+     * Handler for Register form
+     */
+    public function onShowRegisterForm(array $params): array
+    {
+        $serviceId = $this->getServiceComponentId();
+
+        $confirmService = app(ConfirmDialogService::class);
+        $modalUI = $confirmService->getUI(
+            type: DialogType::INFO,
+            title: "Register",
+            message: "Aquí se mostrará el formulario de registro.\n(Por implementar)",
+            confirmAction: 'close_register_dialog',
+            callerServiceId: $serviceId
+        );
+
+        return $modalUI;
+    }
+
+    /**
+     * Handler to close register dialog
+     */
+    public function onCloseRegisterDialog(array $params): array
+    {
+        return [
+            'action' => 'close_modal',
+            'modal_id' => 'confirm_dialog'
+        ];
+    }
+
+    /**
+     * Handler for Profile view
+     */
+    public function onShowProfile(array $params): array
+    {
+        $serviceId = $this->getServiceComponentId();
+
+        $confirmService = app(ConfirmDialogService::class);
+        $modalUI = $confirmService->getUI(
+            type: DialogType::INFO,
+            title: "User Profile",
+            message: "Aquí se mostrará el perfil del usuario.\n(Por implementar)",
+            confirmAction: 'close_profile_dialog',
+            callerServiceId: $serviceId
+        );
+
+        return $modalUI;
+    }
+
+    /**
+     * Handler to close profile dialog
+     */
+    public function onCloseProfileDialog(array $params): array
+    {
+        return [
+            'action' => 'close_modal',
+            'modal_id' => 'confirm_dialog'
+        ];
+    }
+
+    /**
+     * Handler for Logout
+     */
+    public function onLogoutUser(array $params): array
+    {
+        $serviceId = $this->getServiceComponentId();
+
+        $confirmService = app(ConfirmDialogService::class);
+        $modalUI = $confirmService->getUI(
+            type: DialogType::WARNING,
+            title: "Logout",
+            message: "¿Estás seguro que deseas cerrar sesión?",
+            confirmAction: 'confirm_logout',
+            cancelAction: 'cancel_logout',
+            callerServiceId: $serviceId
+        );
+
+        return $modalUI;
+    }
+
+    /**
+     * Handler to confirm logout
+     */
+    public function onConfirmLogout(array $params): array
+    {
+        // TODO: Clear token from localStorage
+        $serviceId = $this->getServiceComponentId();
+
+        $confirmService = app(ConfirmDialogService::class);
+        $modalUI = $confirmService->getUI(
+            type: DialogType::SUCCESS,
+            title: "Logout Exitoso",
+            message: "Has cerrado sesión correctamente.",
+            confirmAction: 'close_logout_dialog',
+            callerServiceId: $serviceId
+        );
+
+        return $modalUI;
+    }
+
+    /**
+     * Handler to cancel logout
+     */
+    public function onCancelLogout(array $params): array
+    {
+        return [
+            'action' => 'close_modal',
+            'modal_id' => 'confirm_dialog'
+        ];
+    }
+
+    /**
+     * Handler to close logout success dialog
+     */
+    public function onCloseLogoutDialog(array $params): array
+    {
+        return [
+            'action' => 'close_modal',
+            'modal_id' => 'confirm_dialog'
+        ];
     }
 }

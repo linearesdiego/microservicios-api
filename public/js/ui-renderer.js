@@ -36,15 +36,17 @@ class UIComponent {
             element.style.borderRadius = this.config.border_radius;
         }
 
-        // Apply layout properties
+        // Apply layout properties with !important to override CSS
         if (this.config.justify_content) {
-            element.style.justifyContent = this.config.justify_content;
+            element.style.setProperty('justify-content', this.config.justify_content, 'important');
         }
         if (this.config.align_items) {
-            element.style.alignItems = this.config.align_items;
+            element.style.setProperty('align-items', this.config.align_items, 'important');
         }
         if (this.config.gap) {
-            element.style.gap = this.config.gap + 'px';
+            // Support both number (px) and string with units
+            const gapValue = typeof this.config.gap === 'number' ? this.config.gap + 'px' : this.config.gap;
+            element.style.setProperty('gap', gapValue, 'important');
         }
 
         // Apply padding

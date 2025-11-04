@@ -14,7 +14,7 @@ body {
 .ui-container {
     /* background: white; */
     border-radius: 6px;
-    padding: 5px;
+    padding: 15px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     margin-bottom: 5px;
     overflow: visible; /* Allow dropdowns and tooltips to overflow */
@@ -30,9 +30,12 @@ body {
 .ui-container.horizontal {
     display: flex;
     flex-direction: row;
-    gap: 15px;
+    /* Remove default gap and align-items - let inline styles or defaults handle it */
+    /* gap: 15px; */
+    /* align-items: stretch; */
     flex-wrap: wrap;
-    align-items: stretch;
+    /* Ensure container takes full width of parent */
+    width: 100%;
 }
 
 .ui-container.horizontal > .ui-container {
@@ -695,6 +698,16 @@ body.modal-open #menu {
     height: 60px;
     display: flex;
     align-items: center;
+    justify-content: space-between; /* Space between menu and user-info */
+}
+
+#menu {
+    flex: 1; /* Grow to fill available space */
+}
+
+#user-info {
+    flex: 0 0 auto; /* Don't grow, don't shrink */
+    margin-left: auto; /* Push to the right */
 }
 
 /* Adjust main content to account for fixed header */
@@ -708,6 +721,15 @@ body.modal-open #menu {
     position: relative;
     display: inline-block;
     z-index: 100; /* Ensure dropdown trigger has proper stacking */
+}
+
+/* When inside a horizontal flex container, behave as flex item */
+.ui-container.horizontal > .menu-dropdown {
+    /* Keep inline-block but make it work with flex */
+    display: inline-block !important;
+    flex-shrink: 0; /* Don't shrink */
+    /* Don't grow to fill space */
+    flex-grow: 0;
 }
 
 .menu-dropdown-trigger {
@@ -759,7 +781,7 @@ body.modal-open #menu {
 .menu-dropdown-content {
     position: absolute;
     top: calc(100% + 8px);
-    left: 0;
+    /* Don't set left or right here - let position classes handle it */
     background: white;
     border: none;
     border-radius: 12px;
@@ -776,13 +798,19 @@ body.modal-open #menu {
     content: '';
     position: absolute;
     top: -8px;
-    left: 20px;
+    left: 20px; /* Default for bottom-left */
     width: 0;
     height: 0;
     border-left: 8px solid transparent;
     border-right: 8px solid transparent;
     border-bottom: 8px solid white;
     filter: drop-shadow(0 -2px 4px rgba(0, 0, 0, 0.1));
+}
+
+/* Arrow position for bottom-right dropdown */
+.position-bottom-right::before {
+    left: auto;
+    right: 20px;
 }
 
 .menu-dropdown-content.show {
@@ -963,12 +991,14 @@ body.modal-open #menu {
 /* ==================== POSITIONING CLASSES ==================== */
 .position-bottom-left {
     top: calc(100% + 8px);
-    left: 0;
+    left: 0 !important;
+    right: auto !important;
 }
 
 .position-bottom-right {
     top: calc(100% + 8px);
-    right: 0;
+    right: 0 !important;
+    left: auto !important;
 }
 
 .position-top-left {
