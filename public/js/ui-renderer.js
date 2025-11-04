@@ -273,7 +273,16 @@ class LabelComponent extends UIComponent {
         }
         
         label.className = classes;
-        label.textContent = this.config.text || '';
+        
+        // Support line breaks (\n) in text
+        const text = this.config.text || '';
+        if (text.includes('\n')) {
+            // Replace \n with <br> tags and preserve whitespace
+            label.style.whiteSpace = 'pre-line';
+            label.textContent = text;
+        } else {
+            label.textContent = text;
+        }
 
         return this.applyCommonAttributes(label);
     }
@@ -1500,7 +1509,14 @@ class UIRenderer {
             
             // Text (labels)
             if (changes.text !== undefined) {
-                element.textContent = changes.text;
+                const text = changes.text;
+                if (text.includes('\n')) {
+                    // Support line breaks
+                    element.style.whiteSpace = 'pre-line';
+                    element.textContent = text;
+                } else {
+                    element.textContent = text;
+                }
             }
             
             // Label (buttons)

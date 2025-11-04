@@ -22,7 +22,7 @@ class LandingDemoService extends AbstractUIService
         // Hero Section
         $container->add(
             UIBuilder::label('welcome')
-                ->text('🚀 Bienvenido a GameCore UI Framework')
+                ->text('🚀 Bienvenido a USIM UI Framework')
                 ->style('h2')
                 ->center()
         );

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Script para ver logs de GameCore
+# Script para ver logs
 # Uso: ./logs.sh [opciones]
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 show_help() {
-    echo -e "${BLUE}GameCore Log Viewer${NC}"
+    echo -e "${BLUE} Log Viewer${NC}"
     echo ""
     echo "Uso: ./logs.sh [opciones]"
     echo ""

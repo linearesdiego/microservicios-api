@@ -382,7 +382,7 @@ class DemoUiService extends AbstractUIService
     public function onTestAction(array $params): void
     {
         $this->lbl_welcome
-            ->text('¡Botón presionado! Acción ejecutada exitosamente.')
+            ->text("✅ ¡Botón presionado!\n\nAhora puedes ver que los saltos de línea\nfuncionan correctamente en las labels.\n\nLínea 1\nLínea 2\nLínea 3")
             ->style('success');
     }
 

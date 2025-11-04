@@ -3,11 +3,11 @@
 namespace App\Services\Screens;
 
 use App\Services\UI\UIBuilder;
+use App\Services\UI\Enums\TimeUnit;
+use App\Services\UI\Enums\DialogType;
 use App\Services\UI\AbstractUIService;
 use App\Services\UI\Components\UIContainer;
 use App\Services\UI\Modals\ConfirmDialogService;
-use App\Services\UI\Enums\DialogType;
-use App\Services\UI\Enums\TimeUnit;
 
 /**
  * Demo Menu Service
@@ -156,8 +156,8 @@ class DemoMenuService extends AbstractUIService
         $confirmService = app(ConfirmDialogService::class);
         $modalUI = $confirmService->getUI(
             type: DialogType::INFO,
-            title: "Acerca de GameCore",
-            message: "Sistema de componentes UI v1.0\n\nDesarrollado con Laravel y componentes modulares.\n\nSoporta: Tables, Modals, Forms, Menus y más.",
+            title: "Acerca de USIM Framework",
+            message: "Sistema de componentes UI v1.0\nDesarrollado con Laravel y componentes modulares.\nSoporta: Tables, Modals, Forms, Menus y más.",
             confirmAction: 'close_about_dialog',
             callerServiceId: $serviceId
         );
@@ -189,7 +189,7 @@ class DemoMenuService extends AbstractUIService
         $modalUI = $confirmService->getUI(
             type: DialogType::ERROR,
             title: "Error de conexión",
-            message: "No se pudo conectar con el servidor.\n\nPor favor, verifica tu conexión a internet e intenta nuevamente.",
+            message: "No se pudo conectar con el servidor.\nPor favor, verifica tu conexión a internet e intenta nuevamente.",
             confirmAction: 'close_error_dialog',
             callerServiceId: $serviceId
         );
