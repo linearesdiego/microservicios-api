@@ -36,9 +36,9 @@ class DemoMenuService extends AbstractUIService
         $menu = UIBuilder::menuDropdown('main_menu')
             ->parent('menu') // Render in #menu div
             ->callerServiceId($serviceId) // Set service for action callbacks
-            ->trigger('🎮 GameCore Menu', '⚡', 'primary') // Custom trigger
+            ->trigger() // Custom trigger
             ->position('bottom-left')
-            ->width(260);
+            ->width(100);
 
         // Home link
         $menu->link('Home', '/', '🏠');
@@ -61,10 +61,6 @@ class DemoMenuService extends AbstractUIService
 
         // UI Components submenu (future components)
         $menu->submenu('Components', '🧩', function($submenu) {
-            $submenu->link('Cards', '/cards', '🃏');
-            $submenu->link('Alerts', '/alerts', '⚠️');
-            $submenu->link('Tabs', '/tabs', '📑');
-            $submenu->separator();
             $submenu->item('Test Error Dialog', 'show_error_dialog', [], '❌');
             $submenu->item('Test Timeout (10s)', 'show_timeout_dialog', ['duration' => 10], '⏱️');
             $submenu->item('Test Timeout (5min)', 'show_timeout_minutes', [], '⏱️');

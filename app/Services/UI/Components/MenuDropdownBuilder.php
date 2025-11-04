@@ -142,7 +142,7 @@ class MenuDropdownBuilder
      * @param string $style Button style (primary, secondary, etc.)
      * @return self
      */
-    public function trigger(string $label = '☰ Menu', ?string $icon = null, string $style = 'default'): self
+    public function trigger(string $label = '☰', ?string $icon = null, string $style = 'default'): self
     {
         $this->config['trigger'] = [
             'label' => $label,
