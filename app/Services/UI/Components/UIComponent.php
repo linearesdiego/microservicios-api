@@ -211,7 +211,7 @@ abstract class UIComponent implements UIElement
     /**
      * {@inheritDoc}
      */
-    public function setVisible(bool $visible): self
+    public function setVisible(bool $visible): static
     {
         $this->config['visible'] = $visible;
         return $this;
@@ -220,16 +220,16 @@ abstract class UIComponent implements UIElement
     /**
      * Fluent API for setting visibility
      */
-    public function visible(bool $visible = true): self
+    public function visible(bool $visible = true): static
     {
         return $this->setVisible($visible);
     }
 
     /**
      * {@inheritDoc}
-     * @return $this
+     * @return static
      */
-    public function name(?string $name): self
+    public function name(?string $name): static
     {
         $this->name = $name;
         if ($name !== null) {
@@ -243,7 +243,7 @@ abstract class UIComponent implements UIElement
     /**
      * {@inheritDoc}
      */
-    public function setName(?string $name): self
+    public function setName(?string $name): static
     {
         $this->name = $name;
         if ($name !== null) {
@@ -265,7 +265,7 @@ abstract class UIComponent implements UIElement
     /**
      * {@inheritDoc}
      */
-    public function setParent(int|string|null $parent): self
+    public function setParent(int|string|null $parent): static
     {
         $this->parent = $parent;
         $this->config['parent'] = $parent;
@@ -276,9 +276,9 @@ abstract class UIComponent implements UIElement
      * Fluent API for setting parent
      * 
      * @param int|string|null $parent The parent (int = parent ID, string = parent name, null = delete)
-     * @return self For method chaining
+     * @return static For method chaining
      */
-    public function parent(int|string|null $parent): self
+    public function parent(int|string|null $parent): static
     {
         return $this->setParent($parent);
     }
@@ -342,9 +342,9 @@ abstract class UIComponent implements UIElement
      * 
      * @param string $key The configuration key
      * @param mixed $value The configuration value
-     * @return self For method chaining
+     * @return static For method chaining
      */
-    protected function setConfig(string $key, mixed $value): self
+    protected function setConfig(string $key, mixed $value): static
     {
         $this->config[$key] = $value;
         return $this;
