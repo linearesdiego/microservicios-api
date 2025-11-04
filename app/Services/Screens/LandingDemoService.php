@@ -46,6 +46,7 @@ class LandingDemoService extends AbstractUIService
         $featuresContainer = UIBuilder::container('features')
             ->layout(LayoutType::HORIZONTAL) // Flex row
             ->padding(20)
+            ->gap("20px")
             ->shadow(false)
             ->justifyContent('center') // Centra las cards horizontalmente
             ->alignItems('center');    // Centra las cards verticalmente

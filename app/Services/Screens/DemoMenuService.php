@@ -389,12 +389,10 @@ class DemoMenuService extends AbstractUIService
     {
         $serviceId = $this->getServiceComponentId();
 
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::INFO,
-            title: "Login",
-            message: "Aquí se mostrará el formulario de login.\n(Por implementar)",
-            confirmAction: 'close_login_dialog',
+        $loginService = app(\App\Services\UI\Modals\LoginDialogService::class);
+        $modalUI = $loginService->getUI(
+            submitAction: 'submit_login',
+            cancelAction: 'close_login_dialog',
             callerServiceId: $serviceId
         );
 
@@ -413,18 +411,34 @@ class DemoMenuService extends AbstractUIService
     }
 
     /**
+     * Handler to submit login (receives email and password from form)
+     */
+    public function onSubmitLogin(array $params): array
+    {
+        // TODO: Validate and authenticate user
+        // For now, just show a success message
+        $email = $params['login_email'] ?? '';
+        $password = $params['login_password'] ?? '';
+
+        // Here you would call the API /api/login with email and password
+        // For now, just close the modal
+        return [
+            'action' => 'close_modal',
+            'modal_id' => 'confirm_dialog'
+        ];
+    }
+
+    /**
      * Handler for Register form
      */
     public function onShowRegisterForm(array $params): array
     {
         $serviceId = $this->getServiceComponentId();
 
-        $confirmService = app(ConfirmDialogService::class);
-        $modalUI = $confirmService->getUI(
-            type: DialogType::INFO,
-            title: "Register",
-            message: "Aquí se mostrará el formulario de registro.\n(Por implementar)",
-            confirmAction: 'close_register_dialog',
+        $registerService = app(\App\Services\UI\Modals\RegisterDialogService::class);
+        $modalUI = $registerService->getUI(
+            submitAction: 'submit_register',
+            cancelAction: 'close_register_dialog',
             callerServiceId: $serviceId
         );
 
@@ -436,6 +450,26 @@ class DemoMenuService extends AbstractUIService
      */
     public function onCloseRegisterDialog(array $params): array
     {
+        return [
+            'action' => 'close_modal',
+            'modal_id' => 'confirm_dialog'
+        ];
+    }
+
+    /**
+     * Handler to submit register (receives form data)
+     */
+    public function onSubmitRegister(array $params): array
+    {
+        // TODO: Validate and create user
+        // For now, just show a success message
+        $name = $params['register_name'] ?? '';
+        $email = $params['register_email'] ?? '';
+        $password = $params['register_password'] ?? '';
+        $passwordConfirmation = $params['register_password_confirmation'] ?? '';
+
+        // Here you would call the API /api/register with the data
+        // For now, just close the modal
         return [
             'action' => 'close_modal',
             'modal_id' => 'confirm_dialog'
