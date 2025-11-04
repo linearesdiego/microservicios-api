@@ -19,82 +19,22 @@ class DemoMenuService extends AbstractUIService
 {
     protected function buildBaseUI(...$params): UIContainer
     {
-        // Menu doesn't use a container, but AbstractUIService requires this method.
-        // Returning empty container - actual menu is built in getUI()
         $menu_placeholder = UIBuilder::container('_menu_placeholder')
-            ->parent('menu');
-        // $menu_placeholder->add(
-        //     $this->buildMenu()
-        // );
+            ->parent('menu')
+            ->shadow(0)
+            ->borderRadius(0)
+            ->padding(0);
+
+        $menu_placeholder->add(
+            $this->buildMenu()
+        );
         return $menu_placeholder;
-        // Explicación: Este método buildBaseUI es necesario para cumplir con la interfaz
-        // de AbstractUIService, pero en este caso no se utiliza para construir el menú real.
-        // En su lugar, devolvemos un contenedor vacío llamado '_menu_placeholder' como marcador de posición.
-        // El menú real se construye en el método getUI().
     }
 
     private function buildMenu(): UIElement
     {
-        return UIBuilder::label('lbl_demo_men')
-            ->text('Menú de Demostración');
-        // $serviceId = $this->getServiceComponentId();
-
-        // // Build menu using UIBuilder with modern design
-        // $menu = UIBuilder::menuDropdown('main_menu')
-        //     ->parent('menu') // Render in #menu div
-        //     ->callerServiceId($serviceId) // Set service for action callbacks
-        //     ->trigger() // Custom trigger
-        //     ->position('bottom-left')
-        //     ->width(100);
-
-        // // Home link
-        // $menu->link('Home', '/', '🏠');
-
-        // $menu->separator();
-
-        // // Demos submenu
-        // $menu->submenu('Demos', '🎮', function ($submenu) {
-        //     $submenu->link('Demo UI', '/demo-ui', '🎨');
-        //     $submenu->link('Table Demo', '/table-demo', '📊');
-        //     $submenu->link('Modal Demo', '/modal-demo', '🪟');
-        //     $submenu->link('Form Demo', '/form-demo', '📝');
-        //     $submenu->link('Button Demo', '/button-demo', '🔘');
-        //     $submenu->link('Input Demo', '/input-demo', '⌨️');
-        //     $submenu->link('Select Demo', '/select-demo', '📋');
-        //     $submenu->link('Checkbox Demo', '/checkbox-demo', '☑️');
-        // });
-
-        // $menu->separator();
-
-        // // UI Components submenu (future components)
-        // $menu->submenu('Components', '🧩', function ($submenu) {
-        //     $submenu->item('Test Error Dialog', 'show_error_dialog', [], '❌');
-        //     $submenu->item('Test Timeout (10s)', 'show_timeout_dialog', ['duration' => 10], '⏱️');
-        //     $submenu->item('Test Timeout (5min)', 'show_timeout_minutes', [], '⏱️');
-        //     $submenu->item('Test Timeout (no button)', 'show_timeout_no_button', [], '⏱️');
-        // });
-
-        // $menu->separator();
-
-        // // Settings (with WARNING dialog)
-        // $menu->item('Settings', 'show_settings_confirm', [], '⚙️');
-
-        // // About (with INFO dialog)
-        // $menu->item('About', 'show_about_info', [], 'ℹ️');
-
-        // return $menu;
-    }
-
-    public function getUI(...$params): array
-    {
-        // Get service ID to receive callbacks
-        $serviceId = $this->getServiceComponentId();
-
-        // Build menu using UIBuilder with modern design
         $menu = UIBuilder::menuDropdown('main_menu')
-            ->parent('menu') // Render in #menu div
-            ->callerServiceId($serviceId) // Set service for action callbacks
-            ->trigger() // Custom trigger
+            ->trigger()
             ->position('bottom-left')
             ->width(100);
 
@@ -103,7 +43,7 @@ class DemoMenuService extends AbstractUIService
 
         $menu->separator();
 
-        // Demos submenu
+        // // Demos submenu
         $menu->submenu('Demos', '🎮', function ($submenu) {
             $submenu->link('Demo UI', '/demo-ui', '🎨');
             $submenu->link('Table Demo', '/table-demo', '📊');
@@ -133,8 +73,59 @@ class DemoMenuService extends AbstractUIService
         // About (with INFO dialog)
         $menu->item('About', 'show_about_info', [], 'ℹ️');
 
-        return $menu->build();
+        return $menu;
     }
+
+    // public function getUI(...$params): array
+    // {
+    //     // Get service ID to receive callbacks
+    //     $serviceId = $this->getServiceComponentId();
+
+    //     // Build menu using UIBuilder with modern design
+    //     $menu = UIBuilder::menuDropdown('main_menu')
+    //         ->parent('menu') // Render in #menu div
+    //         ->callerServiceId($serviceId) // Set service for action callbacks
+    //         ->trigger() // Custom trigger
+    //         ->position('bottom-left')
+    //         ->width(100);
+
+    //     // Home link
+    //     $menu->link('Home', '/', '🏠');
+
+    //     $menu->separator();
+
+    //     // Demos submenu
+    //     $menu->submenu('Demos', '🎮', function ($submenu) {
+    //         $submenu->link('Demo UI', '/demo-ui', '🎨');
+    //         $submenu->link('Table Demo', '/table-demo', '📊');
+    //         $submenu->link('Modal Demo', '/modal-demo', '🪟');
+    //         $submenu->link('Form Demo', '/form-demo', '📝');
+    //         $submenu->link('Button Demo', '/button-demo', '🔘');
+    //         $submenu->link('Input Demo', '/input-demo', '⌨️');
+    //         $submenu->link('Select Demo', '/select-demo', '📋');
+    //         $submenu->link('Checkbox Demo', '/checkbox-demo', '☑️');
+    //     });
+
+    //     $menu->separator();
+
+    //     // UI Components submenu (future components)
+    //     $menu->submenu('Components', '🧩', function ($submenu) {
+    //         $submenu->item('Test Error Dialog', 'show_error_dialog', [], '❌');
+    //         $submenu->item('Test Timeout (10s)', 'show_timeout_dialog', ['duration' => 10], '⏱️');
+    //         $submenu->item('Test Timeout (5min)', 'show_timeout_minutes', [], '⏱️');
+    //         $submenu->item('Test Timeout (no button)', 'show_timeout_no_button', [], '⏱️');
+    //     });
+
+    //     $menu->separator();
+
+    //     // Settings (with WARNING dialog)
+    //     $menu->item('Settings', 'show_settings_confirm', [], '⚙️');
+
+    //     // About (with INFO dialog)
+    //     $menu->item('About', 'show_about_info', [], 'ℹ️');
+
+    //     return $menu->build();
+    // }
 
     /**
      * Handler for Settings confirmation dialog

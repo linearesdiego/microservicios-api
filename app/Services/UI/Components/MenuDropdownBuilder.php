@@ -6,28 +6,49 @@ use App\Services\UI\Support\UIIdGenerator;
 
 /**
  * Menu Dropdown Builder
- * 
+ *
  * Builds dropdown menu structures with support for nested submenus
  */
-class MenuDropdownBuilder
+class MenuDropdownBuilder extends UIComponent
 {
-    private array $config = [];
+    // private array $config = [];
     private array $items = [];
-    private string $name;
+    // private string $name;
 
-    public function __construct(string $name)
+    // public function __construct(string $name)
+    // {
+    //     $this->name = $name;
+    //     $this->config = [
+    //         'type' => 'menu_dropdown',
+    //         'name' => $name,
+    //         'items' => []
+    //     ];
+    // }
+
+    public function getDefaultConfig(): array
     {
-        $this->name = $name;
-        $this->config = [
+        return [
             'type' => 'menu_dropdown',
-            'name' => $name,
+            'name' => $this->name,
             'items' => []
-        ];
+         ];
+    }
+
+    /**
+     * Override toJson to ensure items are included in config
+     */
+    public function toJson(?int $order = null): array
+    {
+        // Copy items to config before rendering
+        $this->config['items'] = $this->items;
+
+        // Call parent implementation
+        return parent::toJson($order);
     }
 
     /**
      * Add a menu item
-     * 
+     *
      * @param string $label Item label
      * @param string|null $action Action to trigger (optional if has submenu)
      * @param array $params Action parameters
@@ -56,7 +77,7 @@ class MenuDropdownBuilder
 
     /**
      * Add a separator line
-     * 
+     *
      * @return self
      */
     public function separator(): self
@@ -69,7 +90,7 @@ class MenuDropdownBuilder
 
     /**
      * Add a menu item with URL navigation
-     * 
+     *
      * @param string $label Item label
      * @param string $url URL to navigate to
      * @param string|null $icon Icon emoji or text
@@ -89,7 +110,7 @@ class MenuDropdownBuilder
 
     /**
      * Create a submenu structure
-     * 
+     *
      * @param string $label Parent item label
      * @param string|null $icon Parent icon
      * @param callable $callback Callback to build submenu items
@@ -99,7 +120,7 @@ class MenuDropdownBuilder
     {
         $submenuBuilder = new self($label . '_submenu');
         $callback($submenuBuilder);
-        
+
         $item = [
             'label' => $label,
             'icon' => $icon,
@@ -112,19 +133,19 @@ class MenuDropdownBuilder
 
     /**
      * Set the parent container for this menu
-     * 
+     *
      * @param string $parentId Parent container ID or name
      * @return self
      */
-    public function parent(string $parentId): self
-    {
-        $this->config['parent'] = $parentId;
-        return $this;
-    }
+    // public function parent(string $parentId): self
+    // {
+    //     $this->config['parent'] = $parentId;
+    //     return $this;
+    // }
 
     /**
      * Set the caller service ID for action callbacks
-     * 
+     *
      * @param string $serviceId Service component ID
      * @return self
      */
@@ -136,7 +157,7 @@ class MenuDropdownBuilder
 
     /**
      * Customize the trigger button
-     * 
+     *
      * @param string $label Button text
      * @param string|null $icon Button icon
      * @param string $style Button style (primary, secondary, etc.)
@@ -154,7 +175,7 @@ class MenuDropdownBuilder
 
     /**
      * Set menu positioning
-     * 
+     *
      * @param string $position 'bottom-left', 'bottom-right', 'top-left', 'top-right'
      * @return self
      */
@@ -166,7 +187,7 @@ class MenuDropdownBuilder
 
     /**
      * Set menu width
-     * 
+     *
      * @param int $width Width in pixels
      * @return self
      */
@@ -178,20 +199,20 @@ class MenuDropdownBuilder
 
     /**
      * Build and return the menu configuration
-     * 
+     *
      * @return array
      */
-    public function build(): array
-    {
-        $this->config['items'] = $this->items;
-        
-        // Generate unique ID for this menu
-        $id = UIIdGenerator::generate($this->name);
-        $this->config['_id'] = $id;
-        
-        // Return as properly formatted UI component array
-        return [
-            $id => $this->config
-        ];
-    }
+    // public function build(): array
+    // {
+    //     $this->config['items'] = $this->items;
+
+    //     // Generate unique ID for this menu
+    //     $id = UIIdGenerator::generate($this->name);
+    //     $this->config['_id'] = $id;
+
+    //     // Return as properly formatted UI component array
+    //     return [
+    //         $id => $this->config
+    //     ];
+    // }
 }

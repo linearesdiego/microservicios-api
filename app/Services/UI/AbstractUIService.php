@@ -20,22 +20,23 @@ use App\Services\UI\Components\SelectBuilder;
 use App\Services\UI\Components\CheckboxBuilder;
 use App\Services\UI\Components\TableRowBuilder;
 use App\Services\UI\Components\TableCellBuilder;
+use App\Services\UI\Components\MenuDropdownBuilder;
 use App\Services\UI\Components\TableHeaderRowBuilder;
 use App\Services\UI\Components\TableHeaderCellBuilder;
 
 /**
  * Abstract UI Service
- * 
+ *
  * Base class for all UI services that handles:
  * - UI state storage and retrieval
  * - Automatic diff calculation
  * - Event lifecycle management
  * - Response formatting
- * 
+ *
  * Child classes only need to:
  * 1. Implement buildBaseUI() to define UI structure
  * 2. Implement event handlers that modify components (no return needed)
- * 
+ *
  * The lifecycle is managed by UIEventController:
  * - initializeEventContext() - Called before event handler
  * - onEventHandler($params) - Your event handler
@@ -65,10 +66,10 @@ abstract class AbstractUIService
 
     /**
      * Build base UI structure
-     * 
+     *
      * Override this method in your service to define the base UI.
      * This will be called automatically if the cache expires.
-     * 
+     *
      * @param mixed ...$params Optional parameters for UI construction
      * @return UIContainer Base UI structure
      */
@@ -76,11 +77,11 @@ abstract class AbstractUIService
 
     /**
      * Initialize event context
-     * 
+     *
      * Called by UIEventController before invoking event handler.
      * Loads UI container and captures state for diff calculation.
      * Also injects component references into protected properties.
-     * 
+     *
      * @return void
      */
     public function initializeEventContext(): void
@@ -95,14 +96,14 @@ abstract class AbstractUIService
 
     /**
      * Inject component references into protected properties
-     * 
+     *
      * Uses reflection to find protected properties with UI component type hints.
-     * If a property name matches a component name in the container, 
+     * If a property name matches a component name in the container,
      * the component is injected into that property.
-     * 
+     *
      * Convention: Property name must match component name
      * Example: protected LabelBuilder $lbl_result; matches component 'lbl_result'
-     * 
+     *
      * @return void
      */
     private function injectComponentReferences(): void
@@ -144,11 +145,11 @@ abstract class AbstractUIService
 
     /**
      * Finalize event context
-     * 
+     *
      * Called by UIEventController after event handler completes.
      * Automatically detects changes by comparing UI state, stores updated UI,
      * and returns formatted response.
-     * 
+     *
      * @return array Indexed diff response
      */
     public function finalizeEventContext(): array
@@ -175,7 +176,7 @@ abstract class AbstractUIService
 
     /**
      * Build diff response in indexed format
-     * 
+     *
      * @return array Indexed diff response
      */
     protected function buildDiffResponse(): array
@@ -203,10 +204,10 @@ abstract class AbstractUIService
 
     /**
      * Get the UI structure
-     * 
+     *
      * Returns the UI from cache or regenerates if not exists.
      * This is the standard public method to retrieve UI for all services.
-     * 
+     *
      * @param mixed ...$params Optional parameters that can be used by child classes
      * @return array UI structure in JSON format
      */
@@ -217,7 +218,7 @@ abstract class AbstractUIService
 
     /**
      * Get stored UI state, regenerate if missing
-     * 
+     *
      * @param mixed ...$params Optional parameters passed to buildBaseUI
      * @return array UI structure in JSON format
      */
@@ -245,7 +246,7 @@ abstract class AbstractUIService
 
     /**
      * Get UI container instance from cache, regenerate if missing
-     * 
+     *
      * @return UIContainer UI container instance
      */
     protected function getUIContainer(): UIContainer
@@ -261,7 +262,7 @@ abstract class AbstractUIService
 
     /**
      * Reconstruct UI container from JSON array
-     * 
+     *
      * @param array $jsonUI JSON representation of UI
      * @return UIContainer Reconstructed container
      */
@@ -338,13 +339,14 @@ abstract class AbstractUIService
             'tableheadercell' => TableHeaderCellBuilder::class,
             'form' => FormBuilder::class,
             'tableheaderrow' => TableHeaderRowBuilder::class,
-            default => null,
+            'menu_dropdown' => MenuDropdownBuilder::class,
+            'default' => null,
         };
     }
 
     /**
      * Store UI state in cache
-     * 
+     *
      * @param UIContainer $ui UI container to store
      * @return void
      */
@@ -355,7 +357,7 @@ abstract class AbstractUIService
 
     /**
      * Clear stored UI state
-     * 
+     *
      * @return void
      */
     public function clearStoredUI(): void
@@ -367,7 +369,7 @@ abstract class AbstractUIService
      * Get the service component ID
      * Returns the ID of the main container, which represents this service
      * Used for modal callbacks to route events back to this service
-     * 
+     *
      * @return int Service component ID
      */
     protected function getServiceComponentId(): int

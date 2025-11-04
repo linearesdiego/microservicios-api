@@ -27,7 +27,7 @@ class UIComponent {
         if (this.config.name) {
             element.id = this.config.name;
         }
-        
+
         // Apply visual styling if specified
         if (this.config.box_shadow) {
             element.style.boxShadow = this.config.box_shadow;
@@ -35,7 +35,7 @@ class UIComponent {
         if (this.config.border_radius) {
             element.style.borderRadius = this.config.border_radius;
         }
-        
+
         // Apply layout properties
         if (this.config.justify_content) {
             element.style.justifyContent = this.config.justify_content;
@@ -46,7 +46,7 @@ class UIComponent {
         if (this.config.gap) {
             element.style.gap = this.config.gap + 'px';
         }
-        
+
         // Apply padding
         if (this.config.padding !== undefined) {
             if (typeof this.config.padding === 'number') {
@@ -55,18 +55,18 @@ class UIComponent {
                 element.style.padding = this.config.padding;
             }
         }
-        
+
         // Apply font size
         if (this.config.font_size) {
             element.style.fontSize = this.config.font_size + 'px';
         }
-        
+
         return element;
     }
 
     /**
      * Send UI event to backend
-     * 
+     *
      * @param {string} event - Event type (click, change, etc.)
      * @param {string} action - Action name (snake_case)
      * @param {object} parameters - Event parameters
@@ -103,7 +103,7 @@ class UIComponent {
             // ÉXITO: response.ok = true (status 200-299)
             if (response.ok) {
                 // console.log('✅ Action executed:', action, result);
-                
+
                 // Handle UI updates using global renderer
                 if (result && Object.keys(result).length > 0) {
                     if (globalRenderer) {
@@ -112,7 +112,7 @@ class UIComponent {
                         console.error('❌ Global renderer not initialized');
                     }
                 }
-                
+
                 // Show success message if provided
                 if (result.message) {
                     this.showNotification(result.message, 'success');
@@ -135,7 +135,7 @@ class UIComponent {
 
     /**
      * Show notification to user
-     * 
+     *
      * @param {string} message - Message to display
      * @param {string} type - Type (success, error, info, warning)
      */
@@ -152,7 +152,7 @@ class ContainerComponent extends UIComponent {
     render() {
         const container = document.createElement('div');
         container.className = `ui-container ${this.config.layout || 'vertical'}`;
-        
+
         if (this.config.title) {
             const title = document.createElement('div');
             title.className = 'title';
@@ -170,7 +170,7 @@ class ButtonComponent extends UIComponent {
         const button = document.createElement('button');
         button.className = `ui-button ${this.config.style || 'primary'}`;
         button.textContent = this.config.label || 'Button';
-        
+
         // Handle enabled state (default to true if not specified)
         const isEnabled = this.config.enabled !== undefined ? this.config.enabled : true;
         button.disabled = !isEnabled;
@@ -192,36 +192,36 @@ class ButtonComponent extends UIComponent {
     handleAction(action, parameters = {}) {
         // Collect values from inputs in the same container context
         const contextValues = this.collectContextValues();
-        
+
         // Merge collected values with explicit parameters (explicit params take precedence)
         const mergedParameters = { ...contextValues, ...parameters };
-        
+
         // Send POST request to backend
         this.sendEventToBackend('click', action, mergedParameters);
     }
 
     /**
      * Collect values from all input elements in the same container context
-     * 
+     *
      * @returns {object} Object with input names as keys and their values
      */
     collectContextValues() {
         const values = {};
-        
+
         // Find the button element in the DOM
         const buttonElement = document.querySelector(`[data-component-id="${this.config._id}"]`);
         if (!buttonElement) {
             console.log('⚠️ Button element not found for collectContextValues');
             return values;
         }
-        
+
         // Find the parent container (or fallback to document)
         let container = buttonElement.closest('.ui-container');
         if (!container) {
             console.log('⚠️ No .ui-container found, using document');
             container = document;
         }
-        
+
         // Collect values from text inputs
         const inputs = container.querySelectorAll('input:not([type="checkbox"]):not([type="radio"]), textarea');
         inputs.forEach(input => {
@@ -230,7 +230,7 @@ class ButtonComponent extends UIComponent {
                 values[input.name] = input.value;
             }
         });
-        
+
         // Collect values from selects
         const selects = container.querySelectorAll('select');
         selects.forEach(select => {
@@ -238,7 +238,7 @@ class ButtonComponent extends UIComponent {
                 values[select.name] = select.value;
             }
         });
-        
+
         // Collect values from checkboxes
         const checkboxes = container.querySelectorAll('input[type="checkbox"]');
         checkboxes.forEach(checkbox => {
@@ -246,7 +246,7 @@ class ButtonComponent extends UIComponent {
                 values[checkbox.name] = checkbox.checked;
             }
         });
-        
+
         // Collect values from radio buttons (only checked ones)
         const radios = container.querySelectorAll('input[type="radio"]:checked');
         radios.forEach(radio => {
@@ -254,7 +254,7 @@ class ButtonComponent extends UIComponent {
                 values[radio.name] = radio.value;
             }
         });
-                
+
         return values;
     }
 }
@@ -263,17 +263,17 @@ class ButtonComponent extends UIComponent {
 class LabelComponent extends UIComponent {
     render() {
         const label = document.createElement('span');
-        
+
         // Apply base class and style
         let classes = `ui-label ${this.config.style || 'default'}`;
-        
+
         // Apply text alignment class
         if (this.config.text_align) {
             classes += ` text-${this.config.text_align}`;
         }
-        
+
         label.className = classes;
-        
+
         // Support line breaks (\n) in text
         const text = this.config.text || '';
         if (text.includes('\n')) {
@@ -373,7 +373,7 @@ class SelectComponent extends UIComponent {
             // Support both formats:
             // 1. Object format: {value: label}
             // 2. Array format: [{value: 'key', label: 'text'}]
-            
+
             if (Array.isArray(this.config.options)) {
                 // Array format: [{value, label}]
                 this.config.options.forEach(opt => {
@@ -414,13 +414,13 @@ class SelectComponent extends UIComponent {
     /**
      * Handle select change event
      * Sends the selected value to the backend
-     * 
+     *
      * @param {string} action - The action name (snake_case)
      * @param {string} value - The selected value
      */
     async handleChange(action, value) {
         console.log('Select changed:', action, value);
-        
+
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
             const componentId = this.config._id || parseInt(this.id);
@@ -448,7 +448,7 @@ class SelectComponent extends UIComponent {
 
             if (response.ok) {
                 console.log('✅ Change event executed:', action, result);
-                
+
                 // Update UI with response
                 if (result && Object.keys(result).length > 0) {
                     if (globalRenderer) {
@@ -587,7 +587,7 @@ class TableComponent extends UIComponent {
                 animation: spin 1s linear infinite;
             "></span>
         `;
-        
+
         // Add CSS animation if not already present
         if (!document.querySelector('#pagination-spinner-style')) {
             const style = document.createElement('style');
@@ -717,11 +717,11 @@ class TableComponent extends UIComponent {
             if (result) {
                 // Extract table data - it's returned with component ID as key
                 const tableData = result[this.id];
-                
+
                 if (tableData && tableData.pagination) {
                     // Update this component's config with new pagination data
                     this.config.pagination = tableData.pagination;
-                    
+
                     // Now re-render pagination controls with updated config
                     const oldPagination = this.element.querySelector('.ui-pagination');
                     if (oldPagination) {
@@ -731,7 +731,7 @@ class TableComponent extends UIComponent {
                 } else {
                     console.log('No pagination found in response');
                 }
-                
+
                 // Apply all other UI updates from server
                 if (globalRenderer) {
                     globalRenderer.handleUIUpdate(result);
@@ -740,7 +740,7 @@ class TableComponent extends UIComponent {
 
         } catch (error) {
             console.error('Error changing page:', error);
-            
+
             // Hide loading state on error
             if (paginationDiv) {
                 this.setLoadingState(paginationDiv, false);
@@ -772,7 +772,7 @@ class TableComponent extends UIComponent {
 
             buttons.forEach((btn, index) => {
                 const btnText = btn.textContent.trim();
-                
+
                 if (btnText === '« Previous') {
                     btn.disabled = !canPrev;
                 } else if (btnText === 'Next »') {
@@ -838,13 +838,13 @@ class TableCellComponent extends UIComponent {
         cell.className = 'ui-table-cell';
 
         // Cell types are mutually exclusive (priority order: button > url_image > text)
-        
+
         if (this.config.button) {
             // Button cell - check first!
             const btn = document.createElement('button');
             btn.className = `ui-button ${this.config.button.style || 'default'}`;
             btn.textContent = this.config.button.label || 'Action';
-            
+
             // Handle button click
             if (this.config.button.action) {
                 btn.addEventListener('click', () => {
@@ -854,7 +854,7 @@ class TableCellComponent extends UIComponent {
                     );
                 });
             }
-            
+
             cell.appendChild(btn);
         }
         else if (this.config.url_image) {
@@ -882,7 +882,7 @@ class TableCellComponent extends UIComponent {
             // Use the minimum width as the actual width for fixed layout
             const targetWidth = this.config.min_width || this.config.max_width;
             cell.style.width = `${targetWidth}px`;
-            
+
             // Still apply max-width to prevent overflow
             if (this.config.max_width) {
                 cell.style.maxWidth = `${this.config.max_width}px`;
@@ -897,7 +897,7 @@ class TableCellComponent extends UIComponent {
      */
     async handleButtonClick(action, parameters) {
         console.log('Table cell button clicked:', action, parameters);
-        
+
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
 
@@ -922,7 +922,7 @@ class TableCellComponent extends UIComponent {
 
             if (response.ok) {
                 console.log('✅ Cell button action executed:', action, result);
-                
+
                 if (result && Object.keys(result).length > 0) {
                     if (globalRenderer) {
                         globalRenderer.handleUIUpdate(result);
@@ -957,7 +957,7 @@ class TableHeaderCellComponent extends UIComponent {
             // Use the minimum width as the actual width for fixed layout
             const targetWidth = this.config.min_width || this.config.max_width;
             cell.style.width = `${targetWidth}px`;
-            
+
             // Still apply max-width to prevent overflow
             if (this.config.max_width) {
                 cell.style.maxWidth = `${this.config.max_width}px`;
@@ -973,7 +973,7 @@ class CardComponent extends UIComponent {
     render() {
         const card = document.createElement('div');
         card.className = this.getCardClasses();
-        
+
         // Handle clickable cards
         if (this.config.clickable) {
             if (this.config.url) {
@@ -1053,7 +1053,7 @@ class CardComponent extends UIComponent {
 
     getCardClasses() {
         let classes = 'ui-card';
-        
+
         if (this.config.style) classes += ` ui-card-${this.config.style}`;
         if (this.config.variant) classes += ` ui-card-${this.config.variant}`;
         if (this.config.size) classes += ` ui-card-${this.config.size}`;
@@ -1062,19 +1062,19 @@ class CardComponent extends UIComponent {
         if (this.config.orientation) classes += ` ui-card-${this.config.orientation}`;
         if (this.config.hover_effect !== false) classes += ` ui-card-hover`;
         if (this.config.clickable) classes += ` ui-card-clickable`;
-        
+
         return classes;
     }
 
     createImageElement() {
         const imageContainer = document.createElement('div');
         imageContainer.className = 'ui-card-image';
-        
+
         const img = document.createElement('img');
         img.src = this.config.image;
         img.alt = this.config.image_alt || this.config.title || '';
         img.style.objectFit = this.config.image_fit || 'cover';
-        
+
         imageContainer.appendChild(img);
         return imageContainer;
     }
@@ -1134,7 +1134,7 @@ class CardComponent extends UIComponent {
                 const button = document.createElement('button');
                 button.className = `ui-button ${actionConfig.style || 'primary'}`;
                 button.textContent = actionConfig.label;
-                
+
                 button.addEventListener('click', (e) => {
                     e.stopPropagation(); // Prevent card click
                     this.sendEventToBackend('click', actionConfig.action, actionConfig.parameters || {});
@@ -1201,9 +1201,9 @@ class UIRenderer {
         // Each component now has _id in its config
         const internalIdToKey = new Map();
         const componentIds = Object.keys(this.data);
-        
+
         // console.log('📋 Component IDs from JSON keys:', componentIds);
-        
+
         for (const key of componentIds) {
             const config = this.data[key];
             if (config._id !== undefined) {
@@ -1232,10 +1232,10 @@ class UIRenderer {
         for (const id of componentIds) {
             const component = this.components.get(id);
             if (!component) continue;
-            
+
             const parentId = component.config.parent;
             let parentKey;
-            
+
             if (typeof parentId === 'string') {
                 // Parent is a DOM element
                 parentKey = parentId;
@@ -1247,7 +1247,7 @@ class UIRenderer {
                     continue;
                 }
             }
-            
+
             if (!childrenByParent.has(parentKey)) {
                 childrenByParent.set(parentKey, []);
             }
@@ -1256,31 +1256,31 @@ class UIRenderer {
                 order: component.config._order ?? 999999
             });
         }
-        
+
         // Sort children within each parent by their _order (or column for table cells, or row for table rows)
         for (const [parent, children] of childrenByParent.entries()) {
             children.sort((a, b) => {
                 const compA = this.components.get(a.id);
                 const compB = this.components.get(b.id);
-                
+
                 // If both are table rows, sort by row index
-                if (compA && compB && 
-                    compA.config.type === 'tablerow' && 
+                if (compA && compB &&
+                    compA.config.type === 'tablerow' &&
                     compB.config.type === 'tablerow') {
                     const rowA = compA.config.row ?? 999999;
                     const rowB = compB.config.row ?? 999999;
                     return rowA - rowB;
                 }
-                
+
                 // If both are table cells or header cells, sort by column
-                if (compA && compB && 
+                if (compA && compB &&
                     (compA.config.type === 'tablecell' || compA.config.type === 'tableheadercell') &&
                     (compB.config.type === 'tablecell' || compB.config.type === 'tableheadercell')) {
                     const colA = compA.config.column ?? 999999;
                     const colB = compB.config.column ?? 999999;
                     return colA - colB;
                 }
-                
+
                 // Otherwise sort by _order
                 return a.order - b.order;
             });
@@ -1295,17 +1295,17 @@ class UIRenderer {
 
         while (mounted.size < this.components.size && iterations < maxIterations) {
             iterations++;
-            
+
             // For each parent, mount its children in order
             for (const [parentKey, children] of childrenByParent.entries()) {
                 for (const childInfo of children) {
                     const id = childInfo.id;
                     const component = this.components.get(id);
-                    
+
                     if (!component || mounted.has(id)) continue;
 
                     const parentId = component.config.parent;
-                    
+
                     // console.log(`  📍 Attempting to mount "${id}" (type: ${component.config.type}), parent: ${parentId}`);
 
                     if (typeof parentId === 'string') {
@@ -1323,7 +1323,7 @@ class UIRenderer {
                         // Parent is a component - find its key using _id
                         const parentComponentKey = internalIdToKey.get(parentId);
                         const parentComponent = this.components.get(parentComponentKey);
-                        
+
                         if (!parentComponent) {
                             console.error(`    ❌ Parent component not found for ID: ${parentId}`);
                             mounted.add(id);
@@ -1334,11 +1334,11 @@ class UIRenderer {
                         if (mounted.has(parentComponentKey)) {
                             // Determine mount target
                             let mountTarget = parentComponent.element;
-                            
+
                             // Special case: if parent is a table, mount rows inside <table> element
                             if (parentComponent.tableElement) {
                                 mountTarget = parentComponent.tableElement;
-                                
+
                                 // Special case: if child is a container inside a table, it's probably the rows container
                                 // Don't create a DOM element for it, just mark it as mounted and let its children mount to the table
                                 if (component.config.type === 'container') {
@@ -1349,7 +1349,7 @@ class UIRenderer {
                                     continue;
                                 }
                             }
-                            
+
                             component.mount(mountTarget);
                             mounted.add(id);
                             // console.log(`    ✅ Mounted to component "${parentComponentKey}" (_id: ${parentId})`);
@@ -1370,12 +1370,12 @@ class UIRenderer {
 
     /**
      * Handle UI updates from backend
-     * 
+     *
      * @param {object} uiUpdate - UI update object (same structure as initial render)
      */
     handleUIUpdate(uiUpdate) {
         // console.log('📦 Processing UI updates:', uiUpdate);
-        
+
         // Check if there are components with parent='modal' - if so, open modal
         let hasModalComponents = false;
         for (const [key, component] of Object.entries(uiUpdate)) {
@@ -1384,13 +1384,13 @@ class UIRenderer {
                 break;
             }
         }
-        
+
         if (hasModalComponents) {
             // Open modal with these components
             openModal(uiUpdate);
             return; // Don't process as regular updates
         }
-        
+
         // Check for special actions
         if (uiUpdate.action) {
             switch (uiUpdate.action) {
@@ -1399,19 +1399,19 @@ class UIRenderer {
                         openModal(uiUpdate.modal);
                     }
                     return; // Don't process as regular updates
-                    
+
                 case 'close_modal':
                     closeModal();
                     break; // Continue to process ui_updates if any
             }
         }
-        
+
         // Handle UI updates if present
         if (uiUpdate.ui_updates) {
             for (const [jsonKey, changes] of Object.entries(uiUpdate.ui_updates)) {
                 const componentId = changes._id;
                 const element = document.querySelector(`[data-component-id="${componentId}"]`);
-                
+
                 if (element) {
                     // Component exists in DOM → UPDATE
                     console.log(`✏️ Updating component ${componentId}`, changes);
@@ -1429,12 +1429,12 @@ class UIRenderer {
                 if (jsonKey === 'action' || jsonKey === 'modal') {
                     continue;
                 }
-                
+
                 const componentId = changes._id;
                 if (!componentId) continue;
-                
+
                 const element = document.querySelector(`[data-component-id="${componentId}"]`);
-                
+
                 if (element) {
                     // console.log(`✏️ Updating ${componentId}`, changes);
                     this.updateComponent(element, changes);
@@ -1448,7 +1448,7 @@ class UIRenderer {
 
     /**
      * Update existing component in DOM
-     * 
+     *
      * @param {HTMLElement} element - DOM element to update
      * @param {object} changes - Properties to update
      */
@@ -1463,11 +1463,11 @@ class UIRenderer {
                 if (changes.button === null) {
                     return;
                 }
-                
+
                 const btn = document.createElement('button');
                 btn.className = `ui-button ${changes.button.style || 'default'}`;
                 btn.textContent = changes.button.label || 'Action';
-                
+
                 // Handle button click
                 if (changes.button.action) {
                     btn.addEventListener('click', async () => {
@@ -1502,11 +1502,11 @@ class UIRenderer {
                         }
                     });
                 }
-                
+
                 element.appendChild(btn);
                 return;
             }
-            
+
             // Text (labels)
             if (changes.text !== undefined) {
                 const text = changes.text;
@@ -1518,36 +1518,36 @@ class UIRenderer {
                     element.textContent = text;
                 }
             }
-            
+
             // Label (buttons)
             if (changes.label !== undefined) {
                 element.textContent = changes.label;
             }
-            
+
             // Style/classes
             if (changes.style !== undefined) {
                 element.classList.remove('default', 'primary', 'secondary', 'success', 'warning', 'danger', 'info');
                 element.classList.add(changes.style);
             }
-            
+
             // Visibility
             if (changes.visible !== undefined) {
                 element.style.display = changes.visible ? '' : 'none';
             }
-            
+
             // Enabled/disabled state
             if (changes.enabled !== undefined) {
                 if (element.tagName === 'BUTTON' || element.tagName === 'INPUT') {
                     element.disabled = !changes.enabled;
                 }
             }
-            
+
             // Disabled state (for selects and other elements)
             if (changes.disabled !== undefined) {
                 const targetElement = element.querySelector('select, input, textarea, button') || element;
                 targetElement.disabled = changes.disabled;
             }
-            
+
             // Value (inputs)
             if (changes.value !== undefined) {
                 if (element.tagName === 'INPUT' || element.tagName === 'TEXTAREA') {
@@ -1557,7 +1557,7 @@ class UIRenderer {
                     if (input) input.value = changes.value;
                 }
             }
-            
+
             // Options (selects)
             if (changes.options !== undefined) {
                 const select = element.querySelector('select') || (element.tagName === 'SELECT' ? element : null);
@@ -1565,12 +1565,12 @@ class UIRenderer {
                     // Clear existing options (except placeholder if exists)
                     const placeholder = select.querySelector('option[disabled][value=""]');
                     select.innerHTML = '';
-                    
+
                     // Re-add placeholder if it existed
                     if (placeholder) {
                         select.appendChild(placeholder);
                     }
-                    
+
                     // Add new options (support both array and object formats)
                     if (Array.isArray(changes.options)) {
                         // Array format: [{value, label}]
@@ -1591,7 +1591,7 @@ class UIRenderer {
                     }
                 }
             }
-            
+
             // Placeholder (selects)
             if (changes.placeholder !== undefined) {
                 const select = element.querySelector('select') || (element.tagName === 'SELECT' ? element : null);
@@ -1610,7 +1610,7 @@ class UIRenderer {
                     }
                 }
             }
-            
+
             // Checked (checkboxes)
             if (changes.checked !== undefined) {
                 if (element.type === 'checkbox') {
@@ -1620,7 +1620,7 @@ class UIRenderer {
                     if (checkbox) checkbox.checked = changes.checked;
                 }
             }
-            
+
             // console.log(`✅ Component ${changes._id} updated successfully`);
         } catch (error) {
             console.error(`❌ Error updating component ${changes._id}:`, error);
@@ -1629,25 +1629,25 @@ class UIRenderer {
 
     /**
      * Add new component to DOM
-     * 
+     *
      * @param {string} jsonKey - JSON key of the component
      * @param {object} config - Component configuration
      */
     addComponent(jsonKey, config) {
         try {
             const component = ComponentFactory.create(jsonKey, config);
-            
+
             if (!component) {
                 console.error(`❌ ComponentFactory returned null for type: ${config.type}`);
                 return;
             }
-            
+
             const element = component.render();
-            
+
             // Find parent and append
-            const parentElement = document.querySelector(`[data-component-id="${config.parent}"]`) 
+            const parentElement = document.querySelector(`[data-component-id="${config.parent}"]`)
                                || document.getElementById(config.parent);
-            
+
             if (parentElement) {
                 parentElement.appendChild(element);
                 console.log(`➕ Component ${config._id} added to parent ${config.parent}`);
@@ -1668,14 +1668,12 @@ async function loadDemoUI(demoName = null) {
     try {
         // Use demo name from window global (set by Laravel) or parameter
         const demo = demoName || window.DEMO_NAME || 'button-demo';
-        // Check if reset flag is set
-        const reset = window.RESET_DEMO ? '/reset' : '';
-        
+
         const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
 
-        console.log(`Fetching UI data from /api/${demo}${reset}...`);
+        console.log(`Fetching UI data from /api/${demo}...`);
 
-        const response = await fetch(`/api/${demo}${reset}`, {
+        const response = await fetch(`/api/${demo}`, {
             method: 'GET',
             headers: {
                 'Accept': 'application/json',
@@ -1689,19 +1687,11 @@ async function loadDemoUI(demoName = null) {
         }
 
         const uiData = await response.json();
-        // console.log('UI Data received:', uiData);
-        
-        // If reset was requested, update URL to normal demo URL (without /reset)
-        if (window.RESET_DEMO) {
-            const normalUrl = `/demo/${demo}`;
-            window.history.replaceState({}, '', normalUrl);
-            window.RESET_DEMO = false; // Reset the flag
-        }
-        
+
         // Create and store global renderer
         globalRenderer = new UIRenderer(uiData);
         globalRenderer.render();
-        
+
     } catch (error) {
         console.error('Error loading demo UI:', error);
         document.getElementById('main').innerHTML = `
@@ -1730,49 +1720,42 @@ window.addEventListener('ui-action', (event) => {
 function openModal(uiData) {
     const overlay = document.getElementById('modal-overlay');
     const modalContainer = document.getElementById('modal');
-    
+
     if (!overlay || !modalContainer) {
         console.error('Modal containers not found in DOM');
         return;
     }
-    
+
     // Clear previous content and any existing timers
     modalContainer.innerHTML = '';
     if (window.modalTimeoutId) {
         clearInterval(window.modalTimeoutId);
         window.modalTimeoutId = null;
     }
-    
+
     // Render modal content using UIRenderer
     // The uiData should already have parent='modal' from the backend
     const modalRenderer = new UIRenderer(uiData);
     modalRenderer.render();
-    
+
     // Check if this is a timeout dialog
     // Look for the container with parent='modal' that has timeout metadata
     let timeoutConfig = null;
-    
+
     for (const [key, component] of Object.entries(uiData)) {
         if (component.parent === 'modal' && component._timeout && component._timeout_ms) {
             timeoutConfig = component;
-            console.log('🔍 Found timeout config in component:', key);
             break;
         }
     }
-    
+
     if (timeoutConfig) {
         const timeoutMs = timeoutConfig._timeout_ms;
         const showCountdown = timeoutConfig._show_countdown ?? true;
         const timeoutAction = timeoutConfig._timeout_action || 'close_modal';
         const callerServiceId = timeoutConfig._caller_service_id;
         const timeUnitLabel = timeoutConfig._time_unit_label || 'segundos';
-        
-        console.log(`⏱️ Timeout dialog detected:`);
-        console.log(`  - Duration: ${timeoutMs}ms (${timeoutConfig._timeout} ${timeUnitLabel})`);
-        console.log(`  - Show countdown: ${showCountdown}`);
-        console.log(`  - Time unit: ${timeoutConfig._time_unit}`);
-        console.log(`  - Timeout action: ${timeoutAction}`);
-        
+
         if (showCountdown) {
             startModalCountdown(timeoutMs, timeoutConfig._timeout, timeoutConfig._time_unit, timeUnitLabel, timeoutAction, callerServiceId);
         } else {
@@ -1782,11 +1765,11 @@ function openModal(uiData) {
             }, timeoutMs);
         }
     }
-    
+
     // Show modal
     overlay.classList.remove('hidden');
     document.body.classList.add('modal-open');
-    
+
     console.log('✅ Modal opened');
 }
 
@@ -1796,24 +1779,24 @@ function openModal(uiData) {
 function closeModal() {
     const overlay = document.getElementById('modal-overlay');
     const modalContainer = document.getElementById('modal');
-    
+
     if (!overlay || !modalContainer) {
         return;
     }
-    
+
     // Clear any active timeout
     if (window.modalTimeoutId) {
         clearInterval(window.modalTimeoutId);
         window.modalTimeoutId = null;
     }
-    
+
     // Clear content
     modalContainer.innerHTML = '';
-    
+
     // Hide modal
     overlay.classList.add('hidden');
     document.body.classList.remove('modal-open');
-    
+
     console.log('✅ Modal closed');
 }
 
@@ -1821,38 +1804,34 @@ function closeModal() {
  * Start countdown timer for modal
  */
 function startModalCountdown(totalMs, initialValue, timeUnit, timeUnitLabel, timeoutAction, callerServiceId) {
-    console.log('🚀 Starting countdown timer...');
-    console.log(`  - Total: ${totalMs}ms`);
-    console.log(`  - Initial: ${initialValue} ${timeUnitLabel}`);
-    console.log(`  - Unit: ${timeUnit}`);
-    
+
     // Wait a bit for the DOM to be fully rendered
     setTimeout(() => {
         // Try to find countdown label by ID (name property creates id attribute)
         let countdownLabel = document.getElementById('countdown');
-        
+
         if (!countdownLabel) {
             // Fallback: Try by querySelector
             countdownLabel = document.querySelector('#modal .ui-label.h2');
             console.log('⚠️ Countdown not found by ID, using fallback selector');
         }
-        
+
         if (!countdownLabel) {
             console.error('❌ Countdown label not found!');
             console.log('📋 Modal HTML:', document.querySelector('#modal')?.innerHTML || 'Modal not found');
             return;
         }
-                
+
         const startTime = Date.now();
         const endTime = startTime + totalMs;
-        
+
         let updateCount = 0;
-        
+
         // Update countdown every 100ms for smooth updates
         window.modalTimeoutId = setInterval(() => {
             const remaining = endTime - Date.now();
             updateCount++;
-            
+
             if (remaining <= 0) {
                 clearInterval(window.modalTimeoutId);
                 window.modalTimeoutId = null;
@@ -1864,12 +1843,12 @@ function startModalCountdown(totalMs, initialValue, timeUnit, timeUnitLabel, tim
                 const remainingValue = Math.ceil(getRemainingValue(remaining, timeUnit));
                 const label = remainingValue === 1 ? getSingularLabel(timeUnit) : timeUnitLabel;
                 const newText = `${remainingValue} ${label}`;
-                
+
                 // Update the label
-                countdownLabel.textContent = newText;                
+                countdownLabel.textContent = newText;
             }
         }, 100);
-        
+
         console.log('✅ Countdown timer started successfully!');
     }, 150); // Wait 150ms for DOM rendering
 }
@@ -1910,7 +1889,7 @@ async function executeTimeoutAction(action, callerServiceId) {
         // Execute custom action via backend
         try {
             const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
-            
+
             const response = await fetch('/api/ui-event', {
                 method: 'POST',
                 headers: {
@@ -1927,9 +1906,9 @@ async function executeTimeoutAction(action, callerServiceId) {
                     parameters: {},
                 }),
             });
-            
+
             const result = await response.json();
-            
+
             if (response.ok && globalRenderer) {
                 globalRenderer.handleUIUpdate(result);
             }
@@ -1962,63 +1941,63 @@ class MenuDropdownComponent extends UIComponent {
     render() {
         const menuContainer = document.createElement('div');
         menuContainer.className = 'menu-dropdown';
-        
+
         // Trigger button with customization
         const trigger = document.createElement('button');
         trigger.className = 'menu-dropdown-trigger';
-        
+
         // Custom trigger configuration
         const triggerConfig = this.config.trigger || {};
         const triggerLabel = triggerConfig.label || '☰ Menu';
         const triggerIcon = triggerConfig.icon;
         const triggerStyle = triggerConfig.style || 'default';
-        
+
         trigger.className += ` menu-trigger-${triggerStyle}`;
-        
+
         // Build trigger content
         let triggerContent = '';
         if (triggerIcon) {
             triggerContent += `<span class="trigger-icon">${triggerIcon}</span>`;
         }
         triggerContent += `<span class="trigger-label">${triggerLabel}</span>`;
-        
+
         trigger.innerHTML = triggerContent;
-        
+
         // Dropdown content with customization
         const content = document.createElement('div');
         content.className = 'menu-dropdown-content';
-        
+
         // Apply position class
         const position = this.config.position || 'bottom-left';
         content.classList.add(`position-${position}`);
-        
+
         // Apply custom width
         if (this.config.width) {
             content.style.minWidth = this.config.width;
         }
-        
+
         // Build menu items
         if (this.config.items && this.config.items.length > 0) {
             this.config.items.forEach(item => {
                 content.appendChild(this.renderMenuItem(item));
             });
         }
-        
+
         // Toggle menu on click with improved UX
         trigger.addEventListener('click', (e) => {
             e.stopPropagation();
             const isActive = content.classList.contains('show');
-            
+
             // Close all other menus first
             this.closeAllMenus();
-            
+
             if (!isActive) {
                 content.classList.add('show');
                 trigger.classList.add('active');
-                
+
                 // Add smooth entrance animation
                 content.style.animationDuration = '0.3s';
-                
+
                 // Focus management for accessibility
                 const firstMenuItem = content.querySelector('.menu-item:not([disabled])');
                 if (firstMenuItem) {
@@ -2026,16 +2005,16 @@ class MenuDropdownComponent extends UIComponent {
                 }
             }
         });
-        
+
         // Close menu when clicking outside (improved for submenus)
         document.addEventListener('click', (e) => {
             // Check if click is outside the entire menu system (including submenus)
-            if (!menuContainer.contains(e.target) && 
+            if (!menuContainer.contains(e.target) &&
                 !e.target.closest('.submenu')) {
                 this.closeMenu(content, trigger);
             }
         });
-        
+
         // Close menu on Escape key
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && content.classList.contains('show')) {
@@ -2043,13 +2022,13 @@ class MenuDropdownComponent extends UIComponent {
                 trigger.focus();
             }
         });
-        
+
         menuContainer.appendChild(trigger);
         menuContainer.appendChild(content);
-        
+
         return this.applyCommonAttributes(menuContainer);
     }
-    
+
     renderMenuItem(item) {
         // Separator
         if (item.type === 'separator') {
@@ -2057,15 +2036,15 @@ class MenuDropdownComponent extends UIComponent {
             separator.className = 'menu-separator';
             return separator;
         }
-        
+
         // Regular item or submenu parent
         const menuItem = document.createElement(item.url ? 'a' : 'button');
         menuItem.className = 'menu-item';
-        
+
         if (item.submenu && item.submenu.length > 0) {
             menuItem.classList.add('has-submenu');
         }
-        
+
         // Icon
         if (item.icon) {
             const icon = document.createElement('span');
@@ -2073,41 +2052,41 @@ class MenuDropdownComponent extends UIComponent {
             icon.textContent = item.icon;
             menuItem.appendChild(icon);
         }
-        
+
         // Label
         const label = document.createElement('span');
         label.textContent = item.label;
         menuItem.appendChild(label);
-        
+
         // Handle URL navigation
         if (item.url) {
             menuItem.href = item.url;
         }
-        
+
         // Handle action with improved UX
         if (item.action) {
             menuItem.addEventListener('click', (e) => {
                 e.preventDefault();
-                
+
                 // Visual feedback
                 menuItem.style.transform = 'scale(0.98)';
                 setTimeout(() => {
                     menuItem.style.transform = '';
                 }, 150);
-                
+
                 // Close all menus
                 this.closeAllMenus();
-                
+
                 // Merge item params with caller service id from menu config
                 const params = {
                     ...(item.params || {}),
                     _caller_service_id: this.config._caller_service_id
                 };
-                
+
                 // Send event to backend
                 this.sendEventToBackend('click', item.action, params);
             });
-            
+
             // Keyboard navigation support
             menuItem.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -2116,23 +2095,23 @@ class MenuDropdownComponent extends UIComponent {
                 }
             });
         }
-        
+
         // Render submenu if exists
         if (item.submenu && item.submenu.length > 0) {
             // console.log(`🔄 Rendering submenu for "${item.label}" with ${item.submenu.length} items`);
-            
+
             const submenu = document.createElement('div');
             submenu.className = 'submenu';
             submenu.style.display = 'none'; // Ensure it starts hidden
-            
+
             item.submenu.forEach(subitem => {
                 submenu.appendChild(this.renderMenuItem(subitem));
             });
-            
+
             menuItem.appendChild(submenu);
-            
+
             let hideTimeout = null;
-            
+
             const showSubmenu = () => {
                 if (hideTimeout) {
                     clearTimeout(hideTimeout);
@@ -2140,38 +2119,38 @@ class MenuDropdownComponent extends UIComponent {
                 }
                 submenu.style.setProperty('display', 'block', 'important');
                 submenu.style.setProperty('opacity', '1', 'important');
-                submenu.style.setProperty('visibility', 'visible', 'important'); 
+                submenu.style.setProperty('visibility', 'visible', 'important');
                 submenu.classList.add('show');
             };
-            
+
             const hideSubmenu = () => {
                 submenu.style.setProperty('display', 'none', 'important');
                 submenu.style.setProperty('opacity', '0', 'important');
                 submenu.style.setProperty('visibility', 'hidden', 'important');
                 submenu.classList.remove('show');
             };
-            
+
             menuItem.addEventListener('mouseenter', (e) => {
                 showSubmenu();
             });
-            
+
             menuItem.addEventListener('mouseleave', (e) => {
                 hideTimeout = setTimeout(hideSubmenu, 200);
             });
-            
+
             // Keep submenu visible when hovering over it
             submenu.addEventListener('mouseenter', () => {
                 showSubmenu();
             });
-            
+
             submenu.addEventListener('mouseleave', () => {
                 hideTimeout = setTimeout(hideSubmenu, 200);
             });
         }
-        
+
         return menuItem;
     }
-    
+
     /**
      * Close all open menus
      */
@@ -2183,7 +2162,7 @@ class MenuDropdownComponent extends UIComponent {
             trigger.classList.remove('active');
         });
     }
-    
+
     /**
      * Close specific menu
      */
@@ -2201,23 +2180,23 @@ async function loadMenuUI() {
         console.log('ℹ️ No MENU_SERVICE defined, skipping menu load');
         return;
     }
-    
+
     try {
-        const response = await fetch(`/api/${window.MENU_SERVICE}/${window.RESET_DEMO ? '1' : '0'}`);
+        const response = await fetch(`/api/${window.MENU_SERVICE}`);
         const uiData = await response.json();
-        
+
         // console.log('📊 Menu UI Data received:', uiData);
-        
+
         const menuContainer = document.getElementById('menu');
         if (!menuContainer) {
             console.error('❌ Menu container #menu not found');
             return;
         }
-        
+
         // Render menu
         const menuRenderer = new UIRenderer(uiData);
         menuRenderer.render();
-        
+
         // console.log('✅ Menu loaded successfully');
     } catch (error) {
         console.error('❌ Error loading menu:', error);
