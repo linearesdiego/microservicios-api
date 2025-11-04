@@ -12,7 +12,7 @@ use App\Services\UI\Modals\ConfirmDialogService;
 
 /**
  * Demo Menu Service
- * 
+ *
  * Builds the main navigation menu for demo screens
  */
 class DemoMenuService extends AbstractUIService
@@ -23,9 +23,9 @@ class DemoMenuService extends AbstractUIService
         // Returning empty container - actual menu is built in getUI()
         $menu_placeholder = UIBuilder::container('_menu_placeholder')
             ->parent('menu');
-        $menu_placeholder->add(
-            $this->buildMenu()
-        );
+        // $menu_placeholder->add(
+        //     $this->buildMenu()
+        // );
         return $menu_placeholder;
         // Explicación: Este método buildBaseUI es necesario para cumplir con la interfaz
         // de AbstractUIService, pero en este caso no se utiliza para construir el menú real.
@@ -85,7 +85,7 @@ class DemoMenuService extends AbstractUIService
         // return $menu;
     }
 
-    public function _getUI(...$params): array
+    public function getUI(...$params): array
     {
         // Get service ID to receive callbacks
         $serviceId = $this->getServiceComponentId();
