@@ -5,7 +5,6 @@ use App\Http\Controllers\UIDemoController;
 use App\Http\Controllers\UIEventController;
 use App\Http\Controllers\LogViewerController;
 use App\Http\Controllers\DocumentationController;
-use App\Http\Controllers\LogViewerController;
 
 // Demo route - Default landing demo
 Route::get('/', fn() => view('demo', [
