@@ -1,0 +1,936 @@
+<?php
+
+namespace App\Http\Controllers\Api;
+
+use App\Http\Controllers\Controller;
+use App\Models\Channel;
+use App\Models\User;
+use App\Models\Media;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
+
+class ChannelController extends Controller
+{
+    /**
+     * GET /api/channels
+     * Listar todos los canales (con paginación y filtros)
+     * Acceso: Admin, Moderador
+     */
+    public function index(Request $request)
+    {
+        $perPage = $request->input('per_page', 20);
+        $search = $request->input('search');
+        $status = $request->input('status');
+        $type = $request->input('type');
+
+        $query = Channel::query()->with(['medias', 'users']);
+
+        // Filtro por búsqueda
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Filtro por estado activo/inactivo
+        if ($status !== null) {
+            $isActive = $status === 'active' || $status === '1' || $status === 'true';
+            $query->where('is_active', $isActive);
+        }
+
+        // Filtro por tipo
+        if ($type) {
+            $query->where('type', $type);
+        }
+
+        // Ordenamiento
+        $sortBy = $request->input('sort_by', 'created_at');
+        $sortOrder = $request->input('sort_order', 'desc');
+        $query->orderBy($sortBy, $sortOrder);
+
+        $channels = $query->paginate($perPage);
+
+        return response()->json([
+            'success' => true,
+            'data' => $channels,
+            'message' => 'Canales obtenidos exitosamente'
+        ], 200);
+    }
+
+    /**
+     * GET /api/channels/{id}
+     * Obtener detalles de un canal específico
+     * Acceso: Admin, Moderador, Publicador (sus canales)
+     */
+    public function show($id)
+    {
+        $channel = Channel::with(['medias', 'users', 'approvedUsers'])->find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        // Si es publicador, verificar que tenga acceso al canal
+        $user = Auth::user();
+        if ($user->hasRole('publisher') && !$user->hasRole(['admin', 'moderator'])) {
+            $hasAccess = $user->channels()->where('channels.id', $id)->exists();
+            if (!$hasAccess) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tienes acceso a este canal'
+                ], 403);
+            }
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $channel,
+            'message' => 'Canal obtenido exitosamente'
+        ], 200);
+    }
+
+    /**
+     * POST /api/channels
+     * Crear un nuevo canal (H06)
+     * Acceso: Solo Admin
+     */
+    public function store(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255|unique:channels,name',
+            'description' => 'required|string|max:1000',
+            'semantic_context' => 'nullable|string|max:2000',
+            'type' => 'required|string|in:departamento,instituto,secretaría,centro',
+            'media_ids' => 'nullable|array',
+            'media_ids.*' => 'exists:media,id',
+            'is_active' => 'boolean'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+                'message' => 'Error de validación'
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Crear el canal
+            $channel = Channel::create([
+                'name' => $request->name,
+                'description' => $request->description,
+                'semantic_context' => $request->semantic_context,
+                'type' => $request->type,
+                'is_active' => $request->input('is_active', true)
+            ]);
+
+            // Asociar medios si se proporcionaron
+            if ($request->has('media_ids') && is_array($request->media_ids)) {
+                $channel->medias()->attach($request->media_ids);
+            }
+
+            // Cargar relaciones para la respuesta
+            $channel->load('medias');
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'data' => $channel,
+                'message' => 'Canal creado exitosamente'
+            ], 201);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al crear el canal: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * PUT /api/channels/{id}
+     * PATCH /api/channels/{id}
+     * Actualizar canal (H08)
+     * Acceso: Solo Admin
+     */
+    public function update(Request $request, $id)
+    {
+        $channel = Channel::find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'name' => ['sometimes', 'required', 'string', 'max:255', Rule::unique('channels', 'name')->ignore($id)],
+            'description' => 'sometimes|required|string|max:1000',
+            'semantic_context' => 'nullable|string|max:2000',
+            'type' => 'sometimes|required|string|in:news,events,academic,social,administrative',
+            'media_ids' => 'nullable|array',
+            'media_ids.*' => 'exists:media,id',
+            'is_active' => 'sometimes|boolean'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+                'message' => 'Error de validación'
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            // Actualizar campos del canal
+            $channel->update($request->only([
+                'name',
+                'description',
+                'semantic_context',
+                'type',
+                'is_active'
+            ]));
+
+            // Actualizar medios si se proporcionaron
+            if ($request->has('media_ids')) {
+                $channel->medias()->sync($request->media_ids);
+            }
+
+            // Cargar relaciones actualizadas
+            $channel->load('medias', 'users');
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'data' => $channel,
+                'message' => 'Canal actualizado exitosamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar el canal: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * DELETE /api/channels/{id}
+     * Eliminar/desactivar un canal
+     * Acceso: Solo Admin
+     */
+    public function destroy($id)
+    {
+        $channel = Channel::find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        try {
+            // Soft delete: desactivar en lugar de eliminar
+            $channel->update(['is_active' => false]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Canal desactivado exitosamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al desactivar el canal: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * GET /api/channels/{id}/medias
+     * Listar medios asociados a un canal
+     * Acceso: Admin, Moderador, Publicador (sus canales)
+     */
+    public function getMedias($id)
+    {
+        $channel = Channel::with('medias')->find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $channel->medias,
+            'message' => 'Medios del canal obtenidos exitosamente'
+        ], 200);
+    }
+
+    /**
+     * POST /api/channels/{id}/medias
+     * Asociar medios al canal (H06, H08)
+     * Acceso: Solo Admin
+     */
+    public function attachMedias(Request $request, $id)
+    {
+        $channel = Channel::find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'media_ids' => 'required|array|min:1',
+            'media_ids.*' => 'exists:media,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+                'message' => 'Error de validación'
+            ], 422);
+        }
+
+        try {
+            // Attach sin eliminar los existentes
+            $channel->medias()->syncWithoutDetaching($request->media_ids);
+            $channel->load('medias');
+
+            return response()->json([
+                'success' => true,
+                'data' => $channel->medias,
+                'message' => 'Medios asociados al canal exitosamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al asociar medios: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * DELETE /api/channels/{id}/medias/{mediaId}
+     * Desasociar un medio del canal (H08)
+     * Acceso: Solo Admin
+     */
+    public function detachMedia($id, $mediaId)
+    {
+        $channel = Channel::find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        try {
+            $channel->medias()->detach($mediaId);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Medio desasociado del canal exitosamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al desasociar medio: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * PUT /api/channels/{id}/medias
+     * Reemplazar todos los medios del canal (H08)
+     * Acceso: Solo Admin
+     */
+    public function syncMedias(Request $request, $id)
+    {
+        $channel = Channel::find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'media_ids' => 'required|array',
+            'media_ids.*' => 'exists:media,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+                'message' => 'Error de validación'
+            ], 422);
+        }
+
+        try {
+            $channel->medias()->sync($request->media_ids);
+            $channel->load('medias');
+
+            return response()->json([
+                'success' => true,
+                'data' => $channel->medias,
+                'message' => 'Medios del canal actualizados exitosamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar medios: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * GET /api/channels/{id}/users
+     * Listar usuarios asignados a un canal (H07)
+     * Acceso: Admin, Moderador
+     */
+    public function getUsers(Request $request, $id)
+    {
+        $channel = Channel::find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        $query = $channel->users();
+
+        // Filtrar por rol
+        if ($request->has('role')) {
+            $query->whereHas('roles', function ($q) use ($request) {
+                $q->where('name', $request->role);
+            });
+        }
+
+        // Filtrar por estado de aprobación
+        if ($request->has('is_approved')) {
+            $isApproved = filter_var($request->is_approved, FILTER_VALIDATE_BOOLEAN);
+            $query->wherePivot('is_approved', $isApproved);
+        }
+
+        $users = $query->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $users,
+            'message' => 'Usuarios del canal obtenidos exitosamente'
+        ], 200);
+    }
+
+    /**
+     * POST /api/channels/{id}/users
+     * Asignar usuarios/publicadores al canal (H07)
+     * Acceso: Solo Admin
+     */
+    public function assignUsers(Request $request, $id)
+    {
+        $channel = Channel::find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'user_ids' => 'required|array|min:1',
+            'user_ids.*' => 'exists:users,id',
+            'send_notification' => 'boolean'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+                'message' => 'Error de validación'
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $adminId = Auth::id();
+            $assignedUsers = [];
+            $notificationsSent = 0;
+
+            foreach ($request->user_ids as $userId) {
+                $user = User::find($userId);
+
+                // Verificar que el usuario tenga rol de publicador
+                if (!$user->hasRole('publisher')) {
+                    continue;
+                }
+
+                // Asignar canal con aprobación automática
+                $channel->users()->syncWithoutDetaching([
+                    $userId => [
+                        'is_approved' => true,
+                        'approved_at' => now(),
+                        'approved_by' => $adminId
+                    ]
+                ]);
+
+                $assignedUsers[] = [
+                    'id' => $user->id,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'is_approved' => true,
+                    'approved_at' => now()
+                ];
+
+                // Enviar notificación (H07 - criterio 4)
+                if ($request->input('send_notification', true)) {
+                    // TODO: Implementar sistema de notificaciones
+                    // $user->notify(new ChannelAssignedNotification($channel));
+                    $notificationsSent++;
+                }
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'data' => [
+                    'channel_id' => $channel->id,
+                    'channel_name' => $channel->name,
+                    'assigned_users' => $assignedUsers,
+                    'notifications_sent' => $notificationsSent
+                ],
+                'message' => 'Usuarios asignados al canal exitosamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al asignar usuarios: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * DELETE /api/channels/{id}/users/{userId}
+     * Revocar acceso de un usuario al canal (H07)
+     * Acceso: Solo Admin
+     */
+    public function revokeUser(Request $request, $id, $userId)
+    {
+        $channel = Channel::find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        $user = User::find($userId);
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario no encontrado'
+            ], 404);
+        }
+
+        try {
+            $channel->users()->detach($userId);
+
+            // Enviar notificación (H07 - criterio 4)
+            if ($request->input('send_notification', true)) {
+                // TODO: Implementar sistema de notificaciones
+                // $user->notify(new ChannelRevokedNotification($channel));
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Acceso del usuario al canal revocado exitosamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al revocar acceso: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * PUT /api/channels/{id}/users
+     * Reemplazar todos los usuarios del canal
+     * Acceso: Solo Admin
+     */
+    public function syncUsers(Request $request, $id)
+    {
+        $channel = Channel::find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        $validator = Validator::make($request->all(), [
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'success' => false,
+                'errors' => $validator->errors(),
+                'message' => 'Error de validación'
+            ], 422);
+        }
+
+        DB::beginTransaction();
+        try {
+            $adminId = Auth::id();
+            $syncData = [];
+
+            foreach ($request->user_ids as $userId) {
+                $syncData[$userId] = [
+                    'is_approved' => true,
+                    'approved_at' => now(),
+                    'approved_by' => $adminId
+                ];
+            }
+
+            $channel->users()->sync($syncData);
+            $channel->load('users');
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'data' => $channel->users,
+                'message' => 'Usuarios del canal actualizados exitosamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al actualizar usuarios: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * POST /api/channels/{id}/users/{userId}/approve
+     * Aprobar solicitud de usuario a canal
+     * Acceso: Solo Admin
+     */
+    public function approveUser($id, $userId)
+    {
+        $channel = Channel::find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        $user = User::find($userId);
+
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario no encontrado'
+            ], 404);
+        }
+
+        try {
+            $channel->users()->updateExistingPivot($userId, [
+                'is_approved' => true,
+                'approved_at' => now(),
+                'approved_by' => Auth::id()
+            ]);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Usuario aprobado en el canal exitosamente'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al aprobar usuario: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * GET /api/users/{id}/channels
+     * Listar canales asignados a un usuario específico
+     * Acceso: Admin, el propio usuario
+     */
+    public function getUserChannels(Request $request, $id = null)
+    {
+        // Si no se proporciona ID, usar el usuario autenticado
+        if ($id === null) {
+            $user = Auth::user();
+        } else {
+            $user = User::find($id);
+            
+            if (!$user) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Usuario no encontrado'
+                ], 404);
+            }
+            
+            // Verificar permisos: solo puede ver sus propios canales o ser admin/moderator
+            $authUser = Auth::user();
+            if ($authUser->id !== (int)$id && !$authUser->hasRole(['admin', 'moderator'])) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'No tienes permiso para ver estos canales'
+                ], 403);
+            }
+        }
+
+        $query = $user->channels();
+
+        // Filtrar por estado de aprobación
+        if ($request->has('is_approved')) {
+            $isApproved = filter_var($request->is_approved, FILTER_VALIDATE_BOOLEAN);
+            $query->wherePivot('is_approved', $isApproved);
+        }
+
+        $channels = $query->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $channels,
+            'message' => 'Canales del usuario obtenidos exitosamente'
+        ], 200);
+    }
+
+    /**
+     * GET /api/me/channels
+     * Listar canales del usuario autenticado
+     * Acceso: Usuario autenticado
+     */
+    public function myChannels()
+    {
+        $user = Auth::user();
+
+        // Solo retornar canales aprobados
+        $channels = $user->channels()
+            ->wherePivot('is_approved', true)
+            ->where('is_active', true)
+            ->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $channels,
+            'message' => 'Tus canales obtenidos exitosamente'
+        ], 200);
+    }
+
+    /**
+     * POST /api/channels/{id}/request-access
+     * Solicitar acceso a un canal
+     * Acceso: Usuario registrado
+     */
+    public function requestAccess($id)
+    {
+        $channel = Channel::find($id);
+
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        if (!$channel->is_active) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El canal no está activo'
+            ], 400);
+        }
+
+        $user = Auth::user();
+
+        // Verificar si ya tiene acceso
+        $hasAccess = $user->channels()->where('channels.id', $id)->exists();
+
+        if ($hasAccess) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Ya tienes una solicitud pendiente o acceso aprobado a este canal'
+            ], 400);
+        }
+
+        try {
+            // Crear solicitud pendiente de aprobación
+            $user->channels()->attach($id, [
+                'is_approved' => false,
+                'approved_at' => null,
+                'approved_by' => null
+            ]);
+
+            // TODO: Notificar a administradores
+            // Admin::notify(new ChannelAccessRequestNotification($user, $channel));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Solicitud de acceso al canal enviada. Pendiente de aprobación por un administrador.'
+            ], 200);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error al solicitar acceso: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * GET /api/channels/search
+     * Búsqueda avanzada de canales
+     * Acceso: Admin, Moderador
+     */
+    public function search(Request $request)
+    {
+        $query = Channel::query()->with(['medias', 'users']);
+
+        // Búsqueda por término
+        if ($request->has('q')) {
+            $searchTerm = $request->q;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                  ->orWhere('description', 'like', "%{$searchTerm}%")
+                  ->orWhere('semantic_context', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        // Filtro por tipo
+        if ($request->has('type')) {
+            $query->where('type', $request->type);
+        }
+
+        // Filtro por estado
+        if ($request->has('is_active')) {
+            $isActive = filter_var($request->is_active, FILTER_VALIDATE_BOOLEAN);
+            $query->where('is_active', $isActive);
+        }
+
+        $channels = $query->get();
+
+        return response()->json([
+            'success' => true,
+            'data' => $channels,
+            'message' => 'Búsqueda completada'
+        ], 200);
+    }
+
+    /**
+     * GET /api/channels/available
+     * Listar canales disponibles para asignación
+     * Acceso: Admin
+     */
+    public function available()
+    {
+        $channels = Channel::where('is_active', true)
+            ->orderBy('name')
+            ->get(['id', 'name', 'description', 'type']);
+
+        return response()->json([
+            'success' => true,
+            'data' => $channels,
+            'message' => 'Canales disponibles obtenidos exitosamente'
+        ], 200);
+    }
+
+    /**
+     * POST /api/channels/{channel}/users/{user}
+     * Asignar un canal a un usuario específico
+     * Acceso: Solo Admin
+     */
+    public function assignUserToChannel($channelId, $userId)
+    {
+        // Verificar que el canal existe
+        $channel = Channel::find($channelId);
+        if (!$channel) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Canal no encontrado'
+            ], 404);
+        }
+
+        // Verificar que el usuario existe
+        $user = User::find($userId);
+        if (!$user) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Usuario no encontrado'
+            ], 404);
+        }
+
+        // Verificar si el usuario ya está asignado al canal
+        if ($channel->users()->where('users.id', $userId)->exists()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'El usuario ya está asignado a este canal'
+            ], 409);
+        }
+
+        // Asignar el usuario al canal con aprobación automática
+        $channel->users()->attach($userId, [
+            'is_approved' => true,
+            'approved_at' => now(),
+            'approved_by' => Auth::id()
+        ]);
+
+        // Recargar la relación
+        $channel->load('users');
+
+        return response()->json([
+            'success' => true,
+            'data' => [
+                'channel' => $channel,
+                'user' => $user
+            ],
+            'message' => 'Usuario asignado al canal exitosamente'
+        ], 200);
+    }
+}

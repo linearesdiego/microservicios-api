@@ -59,7 +59,7 @@ class Channel extends Model
      */
     public function publishedPosts(): BelongsToMany
     {
-        return $this->posts()->where('status', PostStatus::PUBLISHED);
+        return $this->posts()->where('status', 'published');
     }
 
     /**

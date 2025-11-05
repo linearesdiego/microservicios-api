@@ -2,6 +2,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\FileController;
+use App\Http\Controllers\Api\ChannelController;
 
 Route::get('/ping', fn() => response()->json([
     'success' => true,
@@ -41,4 +42,26 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('/download/{filename}', [FileController::class, 'download']);
         Route::delete('/{filename}', [FileController::class, 'delete']);
     });
+
+    // ====================================================================
+    // MÓDULO DE GESTIÓN DE CANALES (H06, H07, H08)
+    // ====================================================================
+    
+    // Crear canal (Admin)
+    Route::post('/channels', [ChannelController::class, 'store'])
+        ->middleware('role:admin');
+    
+    // Listar todos los canales
+    Route::get('/channels', [ChannelController::class, 'index']);
+    
+    // Actualizar canal (Admin)
+    Route::put('/channels/{id}', [ChannelController::class, 'update'])
+        ->middleware('role:admin');
+    
+    // Obtener canales de un usuario (o del autenticado si no se especifica)
+    Route::get('/users/{id?}/channels', [ChannelController::class, 'getUserChannels']);
+    
+    // Asignar canal a usuario (Admin)
+    Route::post('/channels/{channel}/users/{user}', [ChannelController::class, 'assignUserToChannel'])
+        ->middleware('role:admin');
 });
