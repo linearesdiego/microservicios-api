@@ -5,6 +5,7 @@
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
+cd ..
 
 # Colores para la salida
 RED='\033[0;31m'
@@ -28,6 +29,7 @@ show_help() {
     echo "  -e, --errors       Mostrar solo errores"
     echo "  -w, --warnings     Mostrar solo advertencias"
     echo "  -p, --pail         Usar Laravel Pail para ver logs en tiempo real"
+    echo "  -d, --delete       Eliminar el archivo de log"
     echo ""
     echo "Ejemplos:"
     echo "  ./logs.sh -v 100              # Ver últimas 100 líneas"
@@ -215,6 +217,10 @@ while [[ $# -gt 0 ]]; do
             ACTION="pail"
             shift
             ;;
+        -d|--delete)
+            ACTION="delete"
+            shift
+            ;;
         *)
             echo -e "${RED}Opción desconocida: $1${NC}"
             show_help
@@ -249,6 +255,20 @@ case $ACTION in
         ;;
     pail)
         use_pail
+        ;;
+    delete)
+        log_path="storage/logs/$FILE"
+        if [ ! -f "$log_path" ]; then
+            echo -e "${RED}Error: Archivo de log no encontrado: $log_path${NC}"
+            exit 1
+        fi
+        read -p "¿Estás seguro de que deseas eliminar $FILE? (s/N): " confirm
+        if [[ $confirm =~ ^[Ss]$ ]]; then
+            rm "$log_path"
+            echo -e "${GREEN}Archivo de log eliminado: $FILE${NC}"
+        else
+            echo -e "${YELLOW}Operación cancelada${NC}"
+        fi
         ;;
     *)
         # Por defecto, mostrar las últimas 50 líneas
