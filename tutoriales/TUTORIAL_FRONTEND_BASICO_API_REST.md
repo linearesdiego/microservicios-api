@@ -4,6 +4,9 @@
 
 Este tutorial cubre los fundamentos de comunicación entre un frontend vanilla (HTML, CSS, JavaScript) y una API REST construida con Laravel. Se enfoca específicamente en la integración JavaScript-Backend, asumiendo conocimientos previos de HTML, CSS y fundamentos de JavaScript.
 
+> ℹ️ **Nota**
+> Se le llama "vanilla" a JavaScript puro, sin frameworks o librerías adicionales como React, Vue o Angular.
+
 ## Objetivos
 
 - Crear una ruta pública en Laravel que retorne datos en formato JSON
@@ -20,7 +23,7 @@ En Laravel, las rutas públicas de API se definen en `routes/api.php`. Crearemos
 Agregar en `routes/api.php`:
 
 ```php
-Route::get('/welcome', function () {
+Route::get('/landing', function () {
     return response()->json([
         'status' => 'success',
         'message' => 'Bienvenido a la API de Microservicios',
@@ -38,12 +41,12 @@ Iniciar el servidor de desarrollo:
 php artisan serve
 ```
 
-La ruta estará disponible en: `http://localhost:8000/api/welcome`
+La ruta estará disponible en: `http://localhost:8000/api/landing`
 
 Verificar en el navegador o con curl:
 
 ```bash
-curl http://localhost:8000/api/welcome
+curl http://localhost:8000/api/landing
 ```
 
 ### 1.3. Configuración de CORS
@@ -58,6 +61,10 @@ Para desarrollo local, la configuración predeterminada es suficiente. Si se req
 'allowed_methods' => ['*'],
 'allowed_headers' => ['*'],
 ```
+
+> ℹ️ **Nota**
+> A partir de Laravel 7.x, el soporte CORS está integrado por defecto. Pero es importante revisar la configuración para entornos de producción.
+> Para más detalles, consultar la [documentación de Laravel sobre CORS](https://laravel.com/docs/routing#cors).
 
 ## Parte 2: Estructura del Frontend
 
@@ -82,12 +89,14 @@ Crear `public/frontend/index.html`:
 ```html
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Microservicios API - Frontend</title>
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="./frontend/css/styles.css">
 </head>
+
 <body>
     <div class="container">
         <header class="header">
@@ -99,12 +108,12 @@ Crear `public/frontend/index.html`:
         </header>
 
         <main class="main">
-            <section class="welcome-section">
+            <section class="landing-section">
                 <div class="loading" id="loading">
                     <div class="spinner"></div>
                     <p>Cargando...</p>
                 </div>
-                
+
                 <div class="content" id="content" style="display: none;">
                     <h2 class="content__title">Estado de la API</h2>
                     <div class="card">
@@ -152,8 +161,9 @@ Crear `public/frontend/index.html`:
         </footer>
     </div>
 
-    <script src="js/app.js"></script>
+    <script src="./frontend/js/app.js"></script>
 </body>
+
 </html>
 ```
 
@@ -677,7 +687,7 @@ class AppController {
         this.registerEventListeners();
         
         // Cargar datos iniciales
-        await this.loadWelcomeData();
+        await this.loadLandingData();
         
         // Actualizar UI según estado de autenticación
         uiManager.updateAuthUI();
@@ -721,13 +731,13 @@ class AppController {
     /**
      * Carga los datos de bienvenida desde la API
      */
-    async loadWelcomeData() {
+    async loadLandingData() {
         try {
             // Mostrar estado de carga
             uiManager.showLoading();
 
             // Realizar petición a la API
-            const data = await apiClient.get('/welcome');
+            const data = await apiClient.get('/landing');
 
             // Verificar que la respuesta sea exitosa
             if (data.status === 'success') {
@@ -761,7 +771,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 1. **Inicialización**: El evento `DOMContentLoaded` se dispara cuando el DOM está completamente cargado
 2. **Instanciación**: Se crea una instancia de `AppController` y se llama a `init()`
-3. **Petición HTTP**: `apiClient.get('/welcome')` realiza una petición GET al endpoint
+3. **Petición HTTP**: `apiClient.get('/landing')` realiza una petición GET al endpoint
 4. **Procesamiento**: Laravel procesa la petición y retorna una respuesta JSON
 5. **Respuesta**: La respuesta viaja de vuelta al cliente
 6. **Renderizado**: `UIManager` actualiza el DOM con los datos recibidos
@@ -807,14 +817,14 @@ http://localhost:8000/frontend/index.html
 Abrir las herramientas de desarrollador (F12) y verificar:
 
 - **Console**: No debe haber errores JavaScript
-- **Network**: Debe aparecer la petición a `/api/welcome` con status 200
+- **Network**: Debe aparecer la petición a `/api/landing` con status 200
 - **Response**: Verificar la estructura JSON de la respuesta
 
 ### 5.4. Comportamiento Esperado
 
 1. Al cargar la página, debe aparecer un spinner de carga
 2. Después de ~1 segundo, debe mostrarse el contenido con los datos de la API
-3. Los valores mostrados deben corresponder a la respuesta del endpoint `/welcome`
+3. Los valores mostrados deben corresponder a la respuesta del endpoint `/landing`
 4. Las secciones de usuario autenticado y administrador NO deben ser visibles
 
 ## Parte 6: Conceptos Clave del Flujo de Comunicación
@@ -825,10 +835,10 @@ JavaScript es single-threaded, pero las peticiones HTTP son operaciones asíncro
 
 ```javascript
 // Sin await - retorna una Promesa
-const promise = fetch('/api/welcome');
+const promise = fetch('/api/landing');
 
 // Con await - espera el resultado
-const response = await fetch('/api/welcome');
+const response = await fetch('/api/landing');
 ```
 
 ### 6.2. Manejo de Errores
